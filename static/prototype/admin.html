@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>栖屿设计 · 后台管理系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --yolk:#F7D06A; --yolk-d:#E9B949; --ink:#4A3F30; --line:#ECE3D2; --sand:#F9F3E6; --cream:#FFFDF6; }
+    body { font-family: "PingFang SC","Microsoft YaHei",system-ui,sans-serif; background: var(--cream); color: var(--ink); }
+    .font-serif { font-family: "Noto Serif SC", serif; }
+    .sidebar { width: 232px; }
+    .nav-item { border-radius: 12px; transition: all .15s; }
+    .nav-item:hover { background: var(--sand); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(247,208,106,.35), rgba(247,208,106,.15)); color: var(--ink); font-weight: 600; }
+    .nav-item.active .dot { background: var(--yolk-d); }
+    .dot { width:6px;height:6px;border-radius:50%;background:#CDBfA6; }
+    /* 侧边栏分组可折叠（点击二级标题收回/展开子项） */
+    .nav-group-label { cursor:pointer; user-select:none; }
+    .nav-caret { display:inline-block; font-size:10px; margin-right:6px; color:#B6A98E; transition:transform .18s; }
+    .nav-group-label.collapsed .nav-caret { transform:rotate(-90deg); }
+    #sideNav .nav-item.nav-collapsed { display:none !important; }
+    .btn-yolk { background: linear-gradient(135deg, rgba(247,208,106,.9), rgba(233,185,73,.75)); color: var(--ink); }
+    .btn-yolk:hover { background: linear-gradient(135deg, rgba(247,208,106,1), rgba(233,185,73,.9)); }
+    .badge { font-size:12px; padding:2px 10px; border-radius:9999px; }
+    .badge-green { background:#E7F4E8; color:#3C8C4E; }
+    .badge-gray { background:#EFEAE0; color:#9A8C75; }
+    .badge-amber { background:#FBEFD2; color:#B8860B; }
+    .badge-blue { background:#E3EEFB; color:#2F6DB5; }
+    .badge-red { background:#FBE3E3; color:#C0392B; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:16px; }
+    .modal-mask { background:rgba(74,63,48,.45); }
+    .th { background:var(--sand); }
+    .input, .sel, .ta { border:1px solid var(--line); border-radius:10px; background:var(--cream); padding:8px 12px; width:100%; font-size:14px; }
+    .input:focus, .sel:focus, .ta:focus { outline:none; border-color:var(--yolk-d); box-shadow:0 0 0 3px rgba(247,208,106,.25); }
+    .thumb { width:74px;height:74px;border-radius:10px;object-fit:cover;border:1px solid var(--line); }
+    ::-webkit-scrollbar { width:8px;height:8px; } ::-webkit-scrollbar-thumb { background:#E3D8C2;border-radius:8px; }
+    .toast { animation: pop .25s ease; }
+    @keyframes pop { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
+  </style>
+</head>
+<body>
+<script>
+/* ============================================================
+ * 静态演示模式（由构建脚本注入）：
+ *  - 内嵌全部 data/*.json 数据
+ *  - 用内存 mock 覆盖 fetch，免登录、增删改仅本次会话有效
+ *  - file:// 双击即可查看完整后台界面
+ * ============================================================ */
+(function(){
+  var DEMO = {"cases":[{"id":1,"slug":"warm-white-1","category":"private","title":"暖白一居 · 木语时光","cover":"https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80","gallery":["https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80","https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80"],"video_url":"","summary":"以暖白与原木为主调，为独居女生打造的一方治愈小天地。","content":"客厅与卧室用半透纱帘软隔断，白天引入自然光，夜晚暖灯点亮仪式感。收纳全部隐形于通顶柜，让 75㎡ 看起来比实际更通透。","material_notes":"墙面立邦暖白乳胶漆；地板菠萝格实木复合；柜体爱格浅木纹。","studio":"栖屿设计","style_tags":["原木风"],"house_type_tags":["一居室"],"area_range":"60-90","location":"上海 · 徐汇","area":75,"year":2026,"designer":"林小满","is_featured":true,"view_count":342,"price_per_sqm":280,"price_note":"全案设计约 ¥280/㎡ 起，具体按面积与风格微调","status":"published","created_at":"2026-08-10T10:00:00.000Z","updated_at":"2026-08-25T03:13:34.829Z"},{"id":2,"slug":"tiny-38","category":"small","title":"38㎡ 折叠之家","cover":"https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80","gallery":["https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80"],"video_url":"","summary":"38㎡ 开间通过折叠家具与通顶收纳，把睡眠、工作、待客三种模式压缩进同一空间。","content":"白天是通透工作室，夜晚一键展开成卧室。靠家具与灯光完成功能切换，墙体不动。","material_notes":"可折叠家具系统；微水泥地面；局部镜面放大空间。","studio":"栖屿设计","style_tags":["原木风"],"house_type_tags":["开间"],"area_range":"<60","location":"上海 · 静安","area":38,"year":2025,"designer":"周野","is_featured":false,"view_count":198,"price_per_sqm":320,"price_note":"小户型空间折叠方案 ¥320/㎡ 起，含家具选型","status":"published","created_at":"2026-07-21T09:00:00.000Z","updated_at":"2026-08-18T11:20:00.000Z"},{"id":3,"slug":"cream-loft","category":"apartment","title":"loft 光影重构","cover":"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80","gallery":["https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80"],"video_url":"","summary":"挑高 loft 重新梳理上下动线，二层睡眠区退后、一层公共区留白。","content":"天窗与镜面把光影折叠进每个角落，老公寓焕发新生。","material_notes":"奶油色微水泥；原木踏步；天窗隔音玻璃。","studio":"栖屿设计","style_tags":["奶油风"],"house_type_tags":["小两居"],"area_range":"90-120","location":"上海 · 杨浦","area":88,"year":2026,"designer":"苏棠","is_featured":true,"view_count":276,"price_per_sqm":350,"price_note":"loft / 复式全案 ¥350/㎡ 起，含楼梯与采光专项","status":"published","created_at":"2026-08-02T08:00:00.000Z","updated_at":"2026-08-22T16:10:00.000Z"},{"id":4,"slug":"cream-rebirth","category":"apartment","title":"老破小奶油重生","cover":"https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80","gallery":["https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80"],"video_url":"","summary":"62㎡ 旧公寓整体翻新，奶油色统一调性，收纳隐形化，小空间也有大从容。","content":"拆除非承重墙，用收纳墙定义功能区，奶油白让老房焕然一新。","material_notes":"奶油色艺术漆；隐形收纳系统；暖光灯带。","studio":"栖屿设计","style_tags":["奶油风"],"house_type_tags":["一居室"],"area_range":"60-90","location":"上海 · 普陀","area":62,"year":2025,"designer":"苏棠","is_featured":false,"view_count":154,"price_per_sqm":260,"price_note":"旧房翻新奶油系 ¥260/㎡ 起，含基础收纳改造","status":"published","created_at":"2026-08-15T13:00:00.000Z","updated_at":"2026-08-25T03:16:26.782Z"}],"packages":[{"id":1,"slug":"single-space","name":"单空间改造包","type":"单空间","cover":"https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80","summary":"客厅 / 卧室 / 厨房 / 卫生间 单项设计，局部焕新。","description":"针对只想改一个房间的独居用户，提供该空间的一体化设计方案，含平面、效果图、软装清单与预算。","applicable_house_type":"任意户型（单房间）","price_from":3800,"price_per_sqm":180,"price_note":"单空间改造 ¥180/㎡ 起，最低 3,800 元/项","area_step_coefficient":{"<60":1,"60-90":1.15,"90-120":1.3,">120":1.5},"process_steps":["需求沟通：明确该空间的用途与痛点","方案设计：平面 + 效果图 + 软装清单","落地陪跑：主材建议与施工交底","验收实拍：新家交付拍摄"],"status":"published","created_at":"2026-08-05T09:00:00.000Z","updated_at":"2026-08-25T03:13:39.783Z"},{"id":2,"slug":"full-home","name":"整屋套餐包","type":"整屋","cover":"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80","summary":"一居室 / 小两居 全屋一体化设计，全流程托管。","description":"从需求到落地的全案设计，四阶段标准流程全程托管，适合新家或整屋重装用户。","applicable_house_type":"一居室 / 小两居","price_from":12800,"price_per_sqm":260,"price_note":"整屋全案托管 ¥260/㎡ 起，最低 12,800 元/套","area_step_coefficient":{"<60":1,"60-90":1.15,"90-120":1.3,">120":1.5},"process_steps":["需求阶段：问卷 → 沟通 → 上门量房 → 签合同","设计阶段：平面初稿 → 效果图 → 软装 → 深化 → 预算","落地阶段：交底 → 主材陪购 → 施工验收","软装阶段：清单 → 摆场 → 新家实拍"],"status":"published","created_at":"2026-08-05T09:10:00.000Z","updated_at":"2026-08-22T18:00:00.000Z"},{"id":3,"slug":"style-pack","name":"风格定义包","type":"风格","cover":"https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80","summary":"奶油风 / 原木日式 / 极简北欧 等风格方案。","description":"风格拿不准？先用风格定义包看完整效果方案，再决定是否落地，降低决策焦虑。","applicable_house_type":"任意户型","price_from":2800,"price_per_sqm":150,"price_note":"风格定义与效果图 ¥150/㎡ 起，最低 2,800 元/套","area_step_coefficient":{"<60":1,"60-90":1.1,"90-120":1.25,">120":1.4},"process_steps":["风格诊断：确认偏好与适配度","概念方案：风格板 + 色彩材质清单","空间示意：重点空间效果图","落地建议：可采购清单"],"status":"published","created_at":"2026-08-06T10:00:00.000Z","updated_at":"2026-08-21T12:00:00.000Z"}],"news":[{"id":1,"tag":"企业新闻","title":"栖屿设计获年度温馨人居奖","date":"2026-05-18","summary":"在 2026 年度人居设计评选中，栖屿设计凭借「独居小宅」系列作品荣获温馨人居奖。","body":"在 2026 年度人居设计评选中，栖屿设计凭借「独居小宅」系列作品荣获温馨人居奖，评审肯定了我们对一人居情感需求的细腻回应。","cover":"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80","status":"published","created_at":"2026-05-18T02:00:00.000Z","updated_at":"2026-08-25T03:25:28.905Z"},{"id":2,"tag":"行业资讯","title":"2026 独居经济下的小宅设计趋势","date":"2026-04-22","summary":"随着独居人口持续增长，小宅设计从「够住」走向「好住」。","body":"随着独居人口持续增长，小宅设计从「够住」走向「好住」。本报告梳理了收纳隐形化、风格个性化、智能轻量化三大趋势。","cover":"https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80","status":"published","created_at":"2026-04-22T02:00:00.000Z","updated_at":"2026-04-22T02:00:00.000Z"},{"id":3,"tag":"企业新闻","title":"新工作室落址城市副中心","date":"2026-03-08","summary":"为更好服务周边独居青年，新工作室正式落址城市副中心。","body":"为更好服务周边独居青年，栖屿设计新工作室正式落址城市副中心，提供到店咨询与样板间实景体验。","cover":"https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80","status":"published","created_at":"2026-03-08T02:00:00.000Z","updated_at":"2026-03-08T02:00:00.000Z"},{"id":4,"tag":"行业资讯","title":"小户型收纳的 5 个心理学原则","date":"2026-02-14","summary":"收纳不只是空间问题，更是心理秩序。","body":"收纳不只是空间问题，更是心理秩序。我们总结了对抗焦虑、降低决策、视觉留白等 5 个心理学原则，帮你把小家收拾得更安心。","cover":"https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80","status":"published","created_at":"2026-02-14T02:00:00.000Z","updated_at":"2026-02-14T02:00:00.000Z"}],"careers":[{"id":1,"category":"social","title":"主案设计师","type":"全职","location":"上海 · 徐汇","summary":"负责独居小宅方案设计，3 年以上住宅设计经验，能手绘表达、懂施工图。","desc":"负责独居小宅方案设计，3 年以上住宅设计经验。熟悉小户型改造、收纳规划与效果图呈现。","icon":"design","status":"published","created_at":"2026-08-01T02:00:00.000Z","updated_at":"2026-08-25T03:25:28.930Z"},{"id":2,"category":"social","title":"软装搭配师","type":"全职","location":"上海 · 徐汇","summary":"负责软装清单与摆场，审美在线、细节控优先，熟悉家具供应链。","desc":"负责软装清单与摆场，审美在线、细节控优先。","icon":"soft","status":"published","created_at":"2026-08-01T02:00:00.000Z","updated_at":"2026-08-01T02:00:00.000Z"},{"id":3,"category":"campus","title":"设计实习生","type":"实习","location":"上海 · 徐汇","summary":"设计/环艺相关专业，热爱小空间与生活美学，每周到岗 4 天以上。","desc":"设计/环艺相关专业，热爱小空间与生活美学。","icon":"intern","status":"published","created_at":"2026-08-01T02:00:00.000Z","updated_at":"2026-08-01T02:00:00.000Z"},{"id":4,"category":"campus","title":"新媒体运营（校招）","type":"应届","location":"上海 · 徐汇","summary":"负责小红书/抖音内容，懂独居青年的语言，会拍摄与基础剪辑。","desc":"负责小红书/抖音内容，懂独居青年的语言。","icon":"media","status":"published","created_at":"2026-08-01T02:00:00.000Z","updated_at":"2026-08-01T02:00:00.000Z"}],"messages":[{"id":1,"name":"张小姐","phone":"13800001111","email":"zhang@example.com","budget":"3-5万","content":"38㎡ 开间想做原木风，希望工作区和睡眠区分开，预算有限。","source_page":"/cases","kind":"appointment","status":"new","note":"","threads":[],"created_at":"2026-08-23T09:12:00.000Z"},{"id":2,"name":"李先生","phone":"13900002222","email":"","budget":"5-8万","content":"小两居想整屋设计，奶油风，两口之家偶尔父母来住。","source_page":"/packages","kind":"appointment","status":"contacted","note":"已电话沟通，约了本周六上门量房。","threads":[{"id":1,"type":"phone","content":"电话沟通，李先生对小两居整屋方案感兴趣，预算 5-8 万。约了本周六 14:00 上门量房。","author":"admin","created_at":"2026-08-21T16:00:00.000Z"}],"created_at":"2026-08-21T15:40:00.000Z"},{"id":3,"name":"王同学","phone":"13700003333","email":"wang@example.com","budget":"","content":"刚毕业租了开间，想咨询风格定义包看效果再决定。","source_page":"/about/contact","kind":"message","status":"converted","note":"已成交风格定义包，进入设计阶段。","threads":[{"id":1,"type":"wechat","content":"添加王同学微信，发送风格定义包介绍与案例参考。","author":"admin","created_at":"2026-08-18T20:30:00.000Z"},{"id":2,"type":"phone","content":"微信支付定金，已成交风格定义包，进入设计阶段。","author":"admin","created_at":"2026-08-19T10:00:00.000Z"}],"created_at":"2026-08-18T20:05:00.000Z"},{"id":4,"name":"水吉","phone":"16568635587","email":"","budget":"50000","content":"38平方","source_page":"/about/contact","kind":"appointment","status":"new","note":"","threads":[],"created_at":"2026-08-25T06:13:46.283Z"},{"id":5,"name":"sj","phone":"16568635587","email":"","budget":"8888","content":"厨房设计","source_page":"/about/contact","kind":"appointment","status":"new","note":"","threads":[],"created_at":"2026-08-25T08:55:22.987Z"},{"id":6,"name":"wjk","phone":"16568635587","email":"","budget":"8888","content":"21","source_page":"/about/contact","kind":"appointment","status":"new","note":"","threads":[],"created_at":"2026-08-25T09:01:03.850Z"}],"staff":[{"id":1,"username":"admin","name":"系统管理员","nickname":"Admin","gender":"other","departmentId":1,"role":"admin","salt":"8074f5cf50e1aaf8","passwordHash":"6f0f2d8bf4b0346eb479dcc549d9ec55961c1f702ed776acbe20194641306ada","active":true,"lastLoginAt":"2026-08-26T01:50:24.345Z","phone":"13800138000","address":"上海市徐汇区漕溪北路 100 号","idCard":"310104199001010011","created_at":"2026-08-25T06:32:48.869Z"},{"id":2,"username":"sales01","name":"销售-王敏","nickname":"王敏","gender":"female","departmentId":2,"role":"sales","salt":"a59166deeb0f8890","passwordHash":"38f670836869ee9d380a902d4310f60730a7584d6738dcb2bb4212fc181b4738","active":true,"lastLoginAt":"2026-08-25T09:24:08.005Z","phone":"13800138001","address":"上海市静安区南京西路 88 号","idCard":"310106199203052022","created_at":"2026-08-25T06:32:48.870Z"},{"id":3,"username":"design01","name":"设计-李航","nickname":"李航","gender":"male","departmentId":1,"role":"design","salt":"b3cd3030bcb09a92","passwordHash":"a99d175803800c162da310dd3e513db75dc066c8a0bc058be0dfcb64ce8c1ba9","active":true,"lastLoginAt":"","phone":"13800138002","address":"上海市杨浦区淞沪路 333 号","idCard":"310110199105123033","created_at":"2026-08-25T06:32:48.870Z"},{"id":4,"username":"cs01","name":"客服-张悦","nickname":"张悦","gender":"female","departmentId":3,"role":"cs","salt":"6ba336ba4b8f3869","passwordHash":"85145e3acde9b45b0734e150b629e9b3e49945c52377e1cd1fb67a994517f153","active":true,"lastLoginAt":"","phone":"13800138003","address":"上海市普陀区中山北路 200 号","idCard":"310107199408084044","created_at":"2026-08-25T06:32:48.870Z"}],"departments":[{"id":1,"name":"设计部","description":"负责独居小宅方案设计与落地交底","lead":"苏棠","sort":1},{"id":2,"name":"销售部","description":"负责线索跟进、签约与客情维护","lead":"王敏","sort":2},{"id":3,"name":"客服部","description":"负责预约接待、咨询答疑与售后","lead":"张悦","sort":3},{"id":4,"name":"行政部","description":"负责品牌、行政与招聘支持","lead":"—","sort":4}],"login-logs":[{"id":1,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"node","loginTime":"2026-08-25T08:13:03.611Z"},{"id":2,"userId":2,"username":"sales01","name":"销售-王敏","ip":"::1","userAgent":"node","loginTime":"2026-08-25T08:13:03.661Z"},{"id":3,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"node","loginTime":"2026-08-25T08:13:16.177Z"},{"id":4,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"node","loginTime":"2026-08-25T09:23:47.255Z"},{"id":5,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"node","loginTime":"2026-08-25T09:24:07.922Z"},{"id":6,"userId":2,"username":"sales01","name":"销售-王敏","ip":"::1","userAgent":"node","loginTime":"2026-08-25T09:24:08.005Z"},{"id":7,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"curl/8.19.0","loginTime":"2026-08-25T09:31:37.548Z"},{"id":8,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"node","loginTime":"2026-08-25T09:35:40.938Z"},{"id":9,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"node","loginTime":"2026-08-25T09:36:58.485Z"},{"id":10,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"node","loginTime":"2026-08-25T09:38:13.317Z"},{"id":11,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"node","loginTime":"2026-08-25T09:38:37.605Z"},{"id":12,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"curl/8.19.0","loginTime":"2026-08-25T09:38:52.336Z"},{"id":13,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Edg/151.0.0.0","loginTime":"2026-08-26T01:16:13.783Z"},{"id":14,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"curl/8.19.0","loginTime":"2026-08-26T01:50:18.587Z"},{"id":15,"userId":1,"username":"admin","name":"系统管理员","ip":"::1","userAgent":"curl/8.19.0","loginTime":"2026-08-26T01:50:24.345Z"}],"projects":[{"updated_at":"2026-03-12T09:00:00.000Z","id":1,"code":"QY-2026-001","title":"静安小两居·北欧整屋","clientName":"陈女士","clientPhone":"13700000001","designerId":3,"designerName":"设计-李航","siteId":1,"status":"constructing","budget":120000,"area":78,"style":"北欧","address":"上海市静安区南京西路","progress":60,"note":"水电验收完成，进入木工阶段","startDate":"2026-03-20","expectedEndDate":"2026-09-30","created_at":"2026-03-12T09:00:00.000Z"},{"updated_at":"2026-04-18T09:00:00.000Z","id":2,"code":"QY-2026-002","title":"徐汇老公寓·现代改造","clientName":"刘先生","clientPhone":"13700000002","designerId":3,"designerName":"设计-李航","siteId":2,"status":"designing","budget":85000,"area":56,"style":"现代","address":"上海市徐汇区复兴中路","progress":30,"note":"方案二稿沟通中","startDate":"2026-04-25","expectedEndDate":"2026-10-15","created_at":"2026-04-18T09:00:00.000Z"},{"updated_at":"2026-05-22T09:00:00.000Z","id":3,"code":"QY-2026-003","title":"浦东三口之家·日式","clientName":"赵女士","clientPhone":"13700000003","designerId":3,"designerName":"设计-李航","siteId":3,"status":"signed","budget":200000,"area":110,"style":"日式","address":"上海市浦东新区花木路","progress":10,"note":"已签约，待进场","startDate":"2026-05-30","expectedEndDate":"2026-12-20","created_at":"2026-05-22T09:00:00.000Z"},{"updated_at":"2026-06-15T09:00:00.000Z","id":4,"code":"QY-2026-004","title":"杨浦 Loft·工业风","clientName":"孙先生","clientPhone":"13700000004","designerId":null,"designerName":"","siteId":null,"status":"lead","budget":60000,"area":45,"style":"工业","address":"上海市杨浦区平凉路","progress":0,"note":"新线索，待量房","startDate":"","expectedEndDate":"","created_at":"2026-06-15T09:00:00.000Z"},{"updated_at":"2026-07-08T09:00:00.000Z","id":5,"code":"QY-2026-005","title":"普陀婚房·法式轻奢","clientName":"周女士","clientPhone":"13700000005","designerId":3,"designerName":"设计-李航","siteId":null,"status":"done","budget":150000,"area":89,"style":"法式","address":"上海市普陀区长寿路","progress":100,"note":"已结案，客户满意","startDate":"2026-01-10","expectedEndDate":"2026-07-05","created_at":"2026-07-08T09:00:00.000Z"},{"updated_at":"2026-08-03T09:00:00.000Z","id":6,"code":"QY-2026-006","title":"虹口两居·中古风","clientName":"吴先生","clientPhone":"13700000006","designerId":3,"designerName":"设计-李航","siteId":null,"status":"measuring","budget":95000,"area":72,"style":"中古","address":"上海市虹口区四川北路","progress":5,"note":"已预约量房","startDate":"","expectedEndDate":"","created_at":"2026-08-03T09:00:00.000Z"},{"updated_at":"2026-08-12T09:00:00.000Z","id":7,"code":"QY-2026-007","title":"长宁三居·奶油原木","clientName":"郑女士","clientPhone":"13700000007","designerId":3,"designerName":"设计-李航","siteId":null,"status":"quoting","budget":175000,"area":98,"style":"原木","address":"上海市长宁区愚园路","progress":20,"note":"报价方案编制中","startDate":"2026-08-10","expectedEndDate":"2026-12-30","created_at":"2026-08-12T09:00:00.000Z"}],"team":[{"id":1,"name":"李航","title":"主案设计师","specialty":"北欧 / 现代小户型","bio":"8 年住宅设计经验，专注小户型空间高效利用与收纳体系。","avatar":"https://i.pravatar.cc/150?img=12","staffId":3,"order":1,"active":true,"created_at":"2026-08-25T09:22:26.682Z"},{"id":2,"name":"苏棠","title":"设计总监","specialty":"法式 / 轻奢 / 中古","bio":"统筹全案设计与落地交底，把控整体调性与材质。","avatar":"https://i.pravatar.cc/150?img=47","staffId":null,"order":2,"active":true,"created_at":"2026-08-25T09:22:26.682Z"},{"id":3,"name":"王敏","title":"客户顾问","specialty":"需求沟通 / 预算规划","bio":"对接前期线索，帮助客户梳理需求与预算区间。","avatar":"https://i.pravatar.cc/150?img=32","staffId":2,"order":3,"active":true,"created_at":"2026-08-25T09:22:26.682Z"},{"id":4,"name":"张悦","title":"客户经理","specialty":"预约接待 / 售后跟进","bio":"负责预约接待、节点回访与售后协调。","avatar":"https://i.pravatar.cc/150?img=45","staffId":4,"order":4,"active":true,"created_at":"2026-08-25T09:22:26.682Z"}],"sites":[{"id":1,"name":"静安小两居工地","address":"上海市静安区南京西路 XX 号","supervisor":"李航","phone":"13800138002","projectId":1,"remark":"木工阶段，每周三巡检","created_at":"2026-03-25T09:00:00.000Z"},{"id":2,"name":"徐汇老公寓工地","address":"上海市徐汇区复兴中路 XX 号","supervisor":"王工（施工队）","phone":"13900000010","projectId":2,"remark":"待方案定稿后进场","created_at":"2026-04-28T09:00:00.000Z"},{"id":3,"name":"浦东三口之家工地","address":"上海市浦东新区花木路 XX 号","supervisor":"陈工（施工队）","phone":"13900000011","projectId":3,"remark":"签约后排期进场","created_at":"2026-06-02T09:00:00.000Z"}],"site-config":{"company_intro":"栖屿设计 · 专注个人独居温馨小家定制","brand_intro":"栖屿设计成立于 2021 年，专注「个人独居温馨小家定制」，为 22–35 岁的独居青年，把一居、开间、小两居改造成温馨、好住、有风格的家。我们相信，独居也可以很温暖。","process_intro":"我们采用四阶段标准流程，给用户确定感：需求阶段（问卷→沟通→量房→签合同）→ 设计阶段（平面→效果图→软装→深化→预算）→ 落地阶段（交底→主材陪购→验收）→ 软装阶段（清单→摆场→实拍）。","history_timeline":[{"year":"2021","title":"品牌创立","desc":"专注独居小宅定制方向。"},{"year":"2023","title":"百例交付","desc":"累计服务独居用户超 100 户。"},{"year":"2026","title":"官网升级","desc":"全新品牌官网与套餐体系上线。"}],"contact_info":{"phone":"400-888-0000","email":"hello@qiyu.design","address":"上海市黄浦区南京东路 100 号","business_hours":"周一至周日 09:00–20:00"},"social_links":[{"name":"微信","url":"https://weixin.qq.com"},{"name":"抖音","url":"https://douyin.com"},{"name":"小红书","url":"https://xiaohongshu.com"},{"name":"视频号","url":"https://weixin.qq.com"}],"careers":{"social":[{"title":"主案设计师","location":"上海","type":"全职","summary":"负责独居小宅方案设计，3 年以上住宅设计经验。","desc":"独立完成需求沟通、平面与效果图设计，对小户型收纳与采光有自己方法论。"},{"title":"软装搭配师","location":"上海","type":"全职","summary":"负责软装清单与摆场，审美在线、细节控优先。","desc":"熟悉奶油风/原木日式等风格软装供应链，能落地设计意图。"}],"campus":[{"title":"设计实习生","location":"上海","type":"实习","summary":"设计/环艺相关专业，热爱小空间与生活美学。","desc":"参与方案绘制与物料整理，资深设计师带教。"},{"title":"新媒体运营（校招）","location":"上海","type":"应届","summary":"负责小红书/抖音内容，懂独居青年的语言。","desc":"能独立策划并产出符合品牌调性的内容。"}]}}};
+  // 强制以管理员身份进入：直接写入登录态 + 兜底覆盖 getItem（兼容 file:// 无 localStorage / 旧缓存）
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('qiyu_token', 'demo-token');
+      localStorage.setItem('qiyu_role', 'admin');
+      localStorage.setItem('qiyu_name', '系统管理员');
+    }
+  } catch(e){}
+  try {
+    if (typeof localStorage !== 'undefined') {
+      var _g = localStorage.getItem.bind(localStorage);
+      localStorage.getItem = function(k){
+        if (k === 'qiyu_token') return 'demo-token';
+        if (k === 'qiyu_role') return 'admin';
+        if (k === 'qiyu_name') return '系统管理员';
+        return _g(k);
+      };
+    }
+  } catch(e){}
+  // 演示模式下退出按钮改为「刷新回到登录态」而非清空（保持免登录可再进）
+  window.addEventListener('DOMContentLoaded', function(){
+    var btn = document.getElementById('logoutBtn');
+    if (btn) btn.title = '演示模式：点击后返回登录页，任意账号可再次进入';
+  });
+  document.title = '栖屿设计 · 后台管理系统（静态演示版）';
+
+  function ok(data, message){ return { code: 0, message: message || 'ok', data: data }; }
+  function nextId(arr){ return arr.length ? Math.max.apply(null, arr.map(function(x){ return x.id; })) + 1 : 1; }
+  function paginate(arr, page, pageSize){
+    page = Math.max(1, parseInt(page) || 1);
+    pageSize = Math.min(100, Math.max(1, parseInt(pageSize) || 10));
+    var total = arr.length, start = (page - 1) * pageSize;
+    return { items: arr.slice(start, start + pageSize), total: total, page: page, pageSize: pageSize };
+  }
+  function monthCounts(arr){
+    var now = new Date(), y = now.getFullYear(), m = now.getMonth();
+    var thisStart = new Date(y, m, 1).getTime(), lastStart = new Date(y, m - 1, 1).getTime();
+    var tm = 0, lm = 0;
+    arr.forEach(function(x){
+      var t = x.created_at ? new Date(x.created_at).getTime() : NaN;
+      if (isNaN(t)) return;
+      if (t >= thisStart) tm++; else if (t >= lastStart && t < thisStart) lm++;
+    });
+    return { thisMonth: tm, lastMonth: lm, delta: tm - lm };
+  }
+  function resp(code, data, message){
+    var d = ok(data, message);
+    if (code !== 0) d = { code: code, message: message || 'error', data: null };
+    return Promise.resolve({ ok: code === 0, status: code === 0 ? 200 : code, json: function(){ return Promise.resolve(d); } });
+  }
+  function parseReq(url, opt){
+    var method = (opt && opt.method) || 'GET';
+    var body = null;
+    try { body = opt && opt.body ? JSON.parse(opt.body) : null; } catch(e){ body = (opt && opt.body) || null; }
+    var sp = String(url).split('?');
+    var path = sp[0], q = {};
+    if (sp[1]) sp[1].split('&').forEach(function(kv){
+      if (!kv) return;
+      var i = kv.indexOf('=');
+      q[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1));
+    });
+    return { method: method, body: body, path: path, q: q };
+  }
+  function handle(r){
+    var m = r.method, b = r.body || {}, q = r.q || {};
+    var now = new Date().toISOString();
+    var mth;
+
+    // ---- 登录：演示模式任意账号密码均以管理员进入 ----
+    if (r.path === '/api/v1/admin/login' && m === 'POST')
+      return resp(0, { token: 'demo-token', username: b.username || 'admin', name: '系统管理员', role: 'admin' });
+
+    // ---- 概览仪表盘（环比逻辑与 server.js monthCounts 一致） ----
+    if (r.path === '/api/v1/admin/overview' && m === 'GET'){
+      var cM = monthCounts(DEMO.cases), pM = monthCounts(DEMO.packages), sM = monthCounts(DEMO.messages);
+      var counts = { new: 0, contacted: 0, converted: 0, closed: 0 };
+      var kindCount = { appointment: 0, message: 0 };
+      DEMO.messages.forEach(function(x){
+        if (counts[x.status] !== undefined) counts[x.status]++;
+        kindCount[x.kind === 'message' ? 'message' : 'appointment']++;
+      });
+      // 项目状态分布 / 进行中 / 近6月趋势 / 设计师排行（与 server.js 逻辑一致）
+      var PROJ_STATUSES = ['lead','measuring','designing','quoting','signed','constructing','acceptance','done','cancelled'];
+      var projByStatus = {};
+      PROJ_STATUSES.forEach(function(s){ projByStatus[s] = 0; });
+      DEMO.projects.forEach(function(p){ if (projByStatus[p.status] !== undefined) projByStatus[p.status]++; });
+      var projActive = ['measuring','designing','quoting','signed','constructing','acceptance'].reduce(function(a, s){ return a + (projByStatus[s] || 0); }, 0);
+      var pjM = monthCounts(DEMO.projects);
+      var now2 = new Date(), trend = [];
+      for (var i = 5; i >= 0; i--){
+        var dd = new Date(now2.getFullYear(), now2.getMonth() - i, 1);
+        var yy = dd.getFullYear(), mm = dd.getMonth();
+        var st = new Date(yy, mm, 1).getTime(), en = new Date(yy, mm + 1, 1).getTime();
+        var pi = DEMO.projects.filter(function(x){ var t = x.created_at ? new Date(x.created_at).getTime() : NaN; return !isNaN(t) && t >= st && t < en; }).length;
+        var ai = DEMO.messages.filter(function(x){ var t = x.created_at ? new Date(x.created_at).getTime() : NaN; return !isNaN(t) && t >= st && t < en && x.kind !== 'message'; }).length;
+        trend.push({ month: yy + '-' + String(mm + 1).padStart(2, '0'), projects: pi, appointments: ai });
+      }
+      var leadMap = {};
+      DEMO.projects.forEach(function(p){ if (p.designerName) leadMap[p.designerName] = (leadMap[p.designerName] || 0) + 1; });
+      var leaderboard = Object.keys(leadMap).map(function(n){ return { name: n, count: leadMap[n] }; }).sort(function(a, b){ return b.count - a.count; }).slice(0, 8);
+      return resp(0, {
+        caseTotal: DEMO.cases.length, caseThisMonth: cM.thisMonth, caseLastMonth: cM.lastMonth, caseDelta: cM.delta,
+        casePublished: DEMO.cases.filter(function(c){ return c.status === 'published'; }).length,
+        caseDraft: DEMO.cases.filter(function(c){ return c.status === 'draft'; }).length,
+        caseOffline: DEMO.cases.filter(function(c){ return c.status === 'offline'; }).length,
+        packageTotal: DEMO.packages.length, packageThisMonth: pM.thisMonth, packageLastMonth: pM.lastMonth, packageDelta: pM.delta,
+        packagePublished: DEMO.packages.filter(function(p){ return p.status === 'published'; }).length,
+        newsTotal: DEMO.news.length, newsPublished: DEMO.news.filter(function(n){ return n.status === 'published'; }).length,
+        careerTotal: DEMO.careers.length, careerPublished: DEMO.careers.filter(function(j){ return j.status === 'published'; }).length,
+        accountTotal: DEMO.staff.length,
+        messageTotal: DEMO.messages.length, messageThisMonth: sM.thisMonth, messageLastMonth: sM.lastMonth, messageDelta: sM.delta,
+        messageByKind: kindCount, messageByStatus: counts,
+        projectTotal: DEMO.projects.length, projectThisMonth: pjM.thisMonth, projectLastMonth: pjM.lastMonth, projectDelta: pjM.delta,
+        projectByStatus: projByStatus, projectActive: projActive,
+        teamTotal: DEMO.team.length, siteTotal: DEMO.sites.length,
+        monthlyTrend: trend, designerLeaderboard: leaderboard
+      });
+    }
+
+    // ---- 内容资源：cases / packages / news / careers（GET 列表 / POST 新增 / PUT 编辑 / PATCH 上下架 / DELETE） ----
+    var res = { cases: DEMO.cases, packages: DEMO.packages, news: DEMO.news, careers: DEMO.careers };
+    var resName = null;
+    ['cases', 'packages', 'news', 'careers'].forEach(function(k){ if (r.path.indexOf('/api/v1/admin/' + k) === 0) resName = k; });
+    if (resName){
+      var list = res[resName];
+      var labels = { cases: '案例', packages: '套餐', news: '新闻', careers: '岗位' };
+      var label = labels[resName];
+      if (m === 'GET' && r.path === '/api/v1/admin/' + resName){
+        var items = list.slice();
+        if (resName === 'cases' && q.category && q.category !== 'all') items = items.filter(function(x){ return x.category === q.category; });
+        if (resName === 'packages' && q.type && q.type !== 'all') items = items.filter(function(x){ return x.type === q.type; });
+        if (resName === 'news' && q.tag && q.tag !== 'all') items = items.filter(function(x){ return x.tag === q.tag; });
+        if (resName === 'careers' && q.category && q.category !== 'all') items = items.filter(function(x){ return x.category === q.category; });
+        if (q.status && q.status !== 'all') items = items.filter(function(x){ return x.status === q.status; });
+        if (q.q){
+          var kw = String(q.q).toLowerCase();
+          items = items.filter(function(x){
+            return (x.title || '').toLowerCase().indexOf(kw) >= 0 ||
+                   (x.name || '').toLowerCase().indexOf(kw) >= 0 ||
+                   (x.designer || '').toLowerCase().indexOf(kw) >= 0;
+          });
+        }
+        items = items.slice().sort(function(a, b){ return (q.sort === 'hot') ? ((b.view_count || 0) - (a.view_count || 0)) : (new Date(b.created_at) - new Date(a.created_at)); });
+        return resp(0, paginate(items, q.page, q.pageSize));
+      }
+      if (m === 'POST' && r.path === '/api/v1/admin/' + resName){
+        var id = nextId(list);
+        var item = Object.assign({}, b, { id: id, slug: b.slug || (resName === 'cases' ? 'case-' + id : 'pkg-' + id), status: b.status || 'draft', created_at: now, updated_at: now });
+        if (resName === 'cases'){ item.view_count = 0; item.is_featured = !!b.is_featured; }
+        if (resName === 'careers' && !item.category) item.category = 'social';
+        list.push(item);
+        return resp(0, item, label + '创建成功');
+      }
+      var idm = r.path.match(new RegExp('^/api/v1/admin/' + resName + '/(\\d+)$'));
+      if (idm){
+        var rid = parseInt(idm[1]);
+        var idx = list.findIndex(function(x){ return x.id === rid; });
+        if (idx < 0) return resp(404, null, label + '不存在');
+        if (m === 'PUT'){ list[idx] = Object.assign({}, list[idx], b, { id: rid, updated_at: now }); return resp(0, list[idx], label + '更新成功'); }
+        if (m === 'PATCH'){
+          var st = b.status;
+          if (['published', 'offline', 'draft'].indexOf(st) < 0) return resp(400, null, '非法状态');
+          list[idx].status = st; list[idx].updated_at = now;
+          return resp(0, list[idx], st === 'published' ? label + '已上架' : (st === 'offline' ? label + '已下架' : '状态已更新'));
+        }
+        if (m === 'DELETE'){ list.splice(idx, 1); return resp(0, null, label + '已删除'); }
+      }
+    }
+
+    // ---- 留言 / 预约（GET 列表 / PATCH 状态·备注·回复） ----
+    if (r.path === '/api/v1/admin/messages' && m === 'GET'){
+      var ms = DEMO.messages.slice();
+      if (q.status && q.status !== 'all') ms = ms.filter(function(x){ return x.status === q.status; });
+      if (q.source && q.source !== 'all') ms = ms.filter(function(x){ return x.source_page === q.source; });
+      if (q.kind && q.kind !== 'all') ms = ms.filter(function(x){ return (x.kind === 'message' ? 'message' : 'appointment') === q.kind; });
+      if (q.q){
+        var mk = String(q.q).toLowerCase();
+        ms = ms.filter(function(x){ return (x.name || '').toLowerCase().indexOf(mk) >= 0 || (x.phone || '').indexOf(mk) >= 0 || (x.content || '').toLowerCase().indexOf(mk) >= 0; });
+      }
+      ms = ms.slice().sort(function(a, b){ return new Date(b.created_at) - new Date(a.created_at); });
+      return resp(0, paginate(ms, q.page, q.pageSize));
+    }
+    mth = r.path.match(new RegExp('^/api/v1/admin/messages/(\\d+)$'));
+    if (mth && m === 'PATCH'){
+      var mi = DEMO.messages.findIndex(function(x){ return x.id === parseInt(mth[1]); });
+      if (mi < 0) return resp(404, null, '留言不存在');
+      if (b.status) DEMO.messages[mi].status = b.status;
+      if (b.note !== undefined) DEMO.messages[mi].note = b.note;
+      if (b.reply && b.reply.content){
+        DEMO.messages[mi].threads = DEMO.messages[mi].threads || [];
+        DEMO.messages[mi].threads.push({ id: DEMO.messages[mi].threads.length + 1, type: b.reply.type || 'phone', content: b.reply.content, author: 'admin', created_at: now });
+      }
+      return resp(0, DEMO.messages[mi], '留言已更新');
+    }
+
+    // ---- 用户管理（仅管理员，全字段 + 筛选） ----
+    if (r.path === '/api/v1/admin/accounts' && m === 'GET'){
+      var us = DEMO.staff.map(function(s){
+        return { id: s.id, username: s.username, name: s.name, nickname: s.nickname || '', gender: s.gender || 'other',
+          departmentId: s.departmentId || 1, role: s.role, active: s.active !== false, lastLoginAt: s.lastLoginAt || '',
+          phone: s.phone || '', address: s.address || '', idCard: s.idCard || '', created_at: s.created_at };
+      });
+      if (q.role && q.role !== 'all') us = us.filter(function(s){ return s.role === q.role; });
+      if (q.departmentId && q.departmentId !== 'all') us = us.filter(function(s){ return String(s.departmentId) === String(q.departmentId); });
+      if (q.gender && q.gender !== 'all') us = us.filter(function(s){ return s.gender === q.gender; });
+      if (q.active && q.active !== 'all') us = us.filter(function(s){ return (s.active ? 'enabled' : 'disabled') === q.active; });
+      if (q.q){
+        var uk = String(q.q).toLowerCase();
+        us = us.filter(function(s){ return (s.username || '').toLowerCase().indexOf(uk) >= 0 || (s.name || '').toLowerCase().indexOf(uk) >= 0 || (s.phone || '').indexOf(uk) >= 0 || (s.idCard || '').indexOf(uk) >= 0; });
+      }
+      // 分页：带 page 参数返回分页结构；不带返回全量数组（下拉/编辑弹窗取数）
+      if (q.page !== undefined) return resp(0, paginate(us, q.page, q.pageSize));
+      return resp(0, us);
+    }
+    if (r.path === '/api/v1/admin/accounts' && m === 'POST'){
+      if (!b.username || !b.password) return resp(400, null, '请填写账号和初始密码');
+      if (DEMO.staff.some(function(s){ return s.username === b.username; })) return resp(409, null, '该账号名已存在');
+      var nu = { id: nextId(DEMO.staff), username: b.username, name: b.name || b.username, nickname: b.nickname || '',
+        gender: ['male', 'female', 'other'].indexOf(b.gender) >= 0 ? b.gender : 'other',
+        departmentId: b.departmentId ? parseInt(b.departmentId) : 1, role: b.role || 'design',
+        salt: 'demo', passwordHash: 'demo', active: b.active !== false, lastLoginAt: '', phone: b.phone || '', address: b.address || '', idCard: b.idCard || '', created_at: now };
+      DEMO.staff.push(nu);
+      return resp(0, { id: nu.id, username: nu.username, name: nu.name, role: nu.role }, '账号已创建');
+    }
+    mth = r.path.match(new RegExp('^/api/v1/admin/accounts/(\\d+)$'));
+    if (mth){
+      var ai = DEMO.staff.findIndex(function(s){ return s.id === parseInt(mth[1]); });
+      if (ai < 0) return resp(404, null, '账号不存在');
+      if (m === 'PATCH'){
+        ['name', 'nickname', 'phone', 'address', 'idCard'].forEach(function(k){ if (b[k] !== undefined) DEMO.staff[ai][k] = b[k]; });
+        if (b.gender !== undefined) DEMO.staff[ai].gender = ['male', 'female', 'other'].indexOf(b.gender) >= 0 ? b.gender : DEMO.staff[ai].gender;
+        if (b.departmentId !== undefined) DEMO.staff[ai].departmentId = parseInt(b.departmentId) || DEMO.staff[ai].departmentId;
+        if (b.role !== undefined) DEMO.staff[ai].role = b.role;
+        if (b.active !== undefined) DEMO.staff[ai].active = !!b.active;
+        return resp(0, { id: DEMO.staff[ai].id, username: DEMO.staff[ai].username, name: DEMO.staff[ai].name, role: DEMO.staff[ai].role, active: DEMO.staff[ai].active }, '账号已更新');
+      }
+      if (m === 'DELETE'){
+        if (DEMO.staff[ai].username === 'admin') return resp(400, null, '默认管理员账号不可删除');
+        DEMO.staff.splice(ai, 1); return resp(0, null, '账号已删除');
+      }
+    }
+
+    // ---- 部门管理 ----
+    if (r.path === '/api/v1/admin/departments' && m === 'GET'){
+      var dlist = DEMO.departments.slice().sort(function(a, b){ return (a.sort || 0) - (b.sort || 0); });
+      // 分页：带 page 参数返回分页结构；不带返回全量数组（下拉/编辑弹窗取数）
+      if (q.page !== undefined) return resp(0, paginate(dlist, q.page, q.pageSize));
+      return resp(0, dlist);
+    }
+    if (r.path === '/api/v1/admin/departments' && m === 'POST'){
+      if (!b.name) return resp(400, null, '请填写部门名称');
+      var nd = Object.assign({}, b, { id: nextId(DEMO.departments), sort: b.sort != null ? b.sort : DEMO.departments.length + 1 });
+      DEMO.departments.push(nd);
+      return resp(0, nd, '部门已创建');
+    }
+    mth = r.path.match(new RegExp('^/api/v1/admin/departments/(\\d+)$'));
+    if (mth){
+      var di = DEMO.departments.findIndex(function(x){ return x.id === parseInt(mth[1]); });
+      if (di < 0) return resp(404, null, '部门不存在');
+      if (m === 'PUT'){ DEMO.departments[di] = Object.assign({}, DEMO.departments[di], b, { id: parseInt(mth[1]) }); return resp(0, DEMO.departments[di], '部门已更新'); }
+      if (m === 'DELETE'){ DEMO.departments.splice(di, 1); return resp(0, null, '部门已删除'); }
+    }
+
+    // ---- 登录日志 ----
+    if (r.path === '/api/v1/admin/login-logs' && m === 'GET'){
+      var ll = DEMO['login-logs'].slice().sort(function(a, b){ return new Date(b.loginTime) - new Date(a.loginTime); });
+      if (q.userId && q.userId !== 'all') ll = ll.filter(function(x){ return String(x.userId) === String(q.userId); });
+      if (q.q){
+        var lk = String(q.q).toLowerCase();
+        ll = ll.filter(function(x){ return (x.username || '').toLowerCase().indexOf(lk) >= 0 || (x.name || '').toLowerCase().indexOf(lk) >= 0; });
+      }
+      return resp(0, paginate(ll, q.page, q.pageSize));
+    }
+
+    // ---- 业务管理：staff-short / projects / team / sites ----
+    if (r.path === '/api/v1/admin/staff-short' && m === 'GET')
+      return resp(0, DEMO.staff.map(function(s){ return { id: s.id, name: s.name, role: s.role }; }));
+
+    if (r.path === '/api/v1/admin/projects' && m === 'GET'){
+      var pr = DEMO.projects.slice();
+      if (q.status && q.status !== 'all') pr = pr.filter(function(x){ return x.status === q.status; });
+      if (q.designerId && q.designerId !== 'all') pr = pr.filter(function(x){ return String(x.designerId) === String(q.designerId); });
+      if (q.q){
+        var pk = String(q.q).toLowerCase();
+        pr = pr.filter(function(x){ return (x.title || '').toLowerCase().indexOf(pk) >= 0 || (x.clientName || '').toLowerCase().indexOf(pk) >= 0 || (x.clientPhone || '').indexOf(pk) >= 0 || (x.code || '').toLowerCase().indexOf(pk) >= 0; });
+      }
+      pr = pr.slice().sort(function(a, b){ return new Date(b.created_at) - new Date(a.created_at); });
+      return resp(0, paginate(pr, q.page, q.pageSize));
+    }
+    if (r.path === '/api/v1/admin/projects' && m === 'POST'){
+      var pid2 = nextId(DEMO.projects);
+      var pcode = b.code || ('QY-' + new Date().getFullYear() + '-' + String(pid2).padStart(3, '0'));
+      var pdid = b.designerId ? parseInt(b.designerId) : null;
+      var pstaff = DEMO.staff.filter(function(s){ return s.id === pdid; })[0];
+      var pobj = Object.assign({}, b, {
+        id: pid2, code: pcode, designerId: pdid, designerName: pstaff ? (pstaff.name || '') : '',
+        siteId: b.siteId ? parseInt(b.siteId) : null, status: b.status || 'lead',
+        progress: b.progress != null ? Math.max(0, Math.min(100, parseInt(b.progress) || 0)) : 0,
+        budget: b.budget != null ? (parseInt(b.budget) || 0) : 0, area: b.area != null ? (parseInt(b.area) || 0) : 0,
+        created_at: now, updated_at: now
+      });
+      DEMO.projects.push(pobj);
+      return resp(0, pobj, '项目创建成功');
+    }
+    var pmt = r.path.match(new RegExp('^/api/v1/admin/projects/(\\d+)$'));
+    if (pmt){
+      var pidx2 = DEMO.projects.findIndex(function(x){ return x.id === parseInt(pmt[1]); });
+      if (pidx2 < 0) return resp(404, null, '项目不存在');
+      if (m === 'PUT'){
+        var pdid2 = b.designerId !== undefined ? (b.designerId ? parseInt(b.designerId) : null) : DEMO.projects[pidx2].designerId;
+        var pstaff2 = DEMO.staff.filter(function(s){ return s.id === pdid2; })[0];
+        DEMO.projects[pidx2] = Object.assign({}, DEMO.projects[pidx2], b, {
+          id: parseInt(pmt[1]), designerId: pdid2,
+          designerName: b.designerId !== undefined ? (pstaff2 ? pstaff2.name : '') : DEMO.projects[pidx2].designerName,
+          siteId: b.siteId !== undefined ? (b.siteId ? parseInt(b.siteId) : null) : DEMO.projects[pidx2].siteId,
+          progress: b.progress != null ? Math.max(0, Math.min(100, parseInt(b.progress) || 0)) : DEMO.projects[pidx2].progress,
+          budget: b.budget != null ? (parseInt(b.budget) || 0) : DEMO.projects[pidx2].budget,
+          area: b.area != null ? (parseInt(b.area) || 0) : DEMO.projects[pidx2].area,
+          updated_at: now
+        });
+        return resp(0, DEMO.projects[pidx2], '项目更新成功');
+      }
+      if (m === 'PATCH'){
+        if (b.status !== undefined) DEMO.projects[pidx2].status = b.status;
+        if (b.progress !== undefined) DEMO.projects[pidx2].progress = Math.max(0, Math.min(100, parseInt(b.progress) || 0));
+        if (b.note !== undefined) DEMO.projects[pidx2].note = b.note;
+        DEMO.projects[pidx2].updated_at = now;
+        return resp(0, DEMO.projects[pidx2], '项目状态已更新');
+      }
+      if (m === 'DELETE'){ DEMO.projects.splice(pidx2, 1); return resp(0, null, '项目已删除'); }
+    }
+
+    if (r.path === '/api/v1/admin/team' && m === 'GET'){
+      var tlist = DEMO.team.slice().sort(function(a, b){ return (a.order || 0) - (b.order || 0); });
+      // 分页：带 page 参数返回分页结构；不带返回全量数组（编辑弹窗取数）
+      if (q.page !== undefined) return resp(0, paginate(tlist, q.page, q.pageSize));
+      return resp(0, tlist);
+    }
+    if (r.path === '/api/v1/admin/team' && m === 'POST'){
+      if (!b.name) return resp(400, null, '请填写成员姓名');
+      var nt = Object.assign({}, b, { id: nextId(DEMO.team), order: b.order != null ? parseInt(b.order) : DEMO.team.length + 1, active: b.active !== false, created_at: now });
+      DEMO.team.push(nt);
+      return resp(0, nt, '团队成员已添加');
+    }
+    var tmt = r.path.match(new RegExp('^/api/v1/admin/team/(\\d+)$'));
+    if (tmt){
+      var tidx2 = DEMO.team.findIndex(function(x){ return x.id === parseInt(tmt[1]); });
+      if (tidx2 < 0) return resp(404, null, '成员不存在');
+      if (m === 'PUT'){
+        DEMO.team[tidx2] = Object.assign({}, DEMO.team[tidx2], b, { id: parseInt(tmt[1]), order: b.order != null ? parseInt(b.order) : DEMO.team[tidx2].order, active: b.active !== undefined ? b.active : DEMO.team[tidx2].active, updated_at: now });
+        return resp(0, DEMO.team[tidx2], '团队成员已更新');
+      }
+      if (m === 'DELETE'){ DEMO.team.splice(tidx2, 1); return resp(0, null, '成员已删除'); }
+    }
+
+    if (r.path === '/api/v1/admin/sites' && m === 'GET'){
+      var sts = DEMO.sites.slice();
+      if (q.projectId && q.projectId !== 'all') sts = sts.filter(function(x){ return String(x.projectId) === String(q.projectId); });
+      if (q.q){
+        var sk = String(q.q).toLowerCase();
+        sts = sts.filter(function(x){ return (x.name || '').toLowerCase().indexOf(sk) >= 0 || (x.supervisor || '').toLowerCase().indexOf(sk) >= 0 || (x.phone || '').indexOf(sk) >= 0 || (x.address || '').toLowerCase().indexOf(sk) >= 0; });
+      }
+      sts = sts.slice().sort(function(a, b){ return new Date(b.created_at) - new Date(a.created_at); });
+      return resp(0, paginate(sts, q.page, q.pageSize));
+    }
+    if (r.path === '/api/v1/admin/sites' && m === 'POST'){
+      if (!b.name) return resp(400, null, '请填写工地名称');
+      var ns = Object.assign({}, b, { id: nextId(DEMO.sites), projectId: b.projectId ? parseInt(b.projectId) : null, created_at: now });
+      DEMO.sites.push(ns);
+      return resp(0, ns, '工地联系已添加');
+    }
+    var smt = r.path.match(new RegExp('^/api/v1/admin/sites/(\\d+)$'));
+    if (smt){
+      var sidx2 = DEMO.sites.findIndex(function(x){ return x.id === parseInt(smt[1]); });
+      if (sidx2 < 0) return resp(404, null, '工地不存在');
+      if (m === 'PUT'){
+        DEMO.sites[sidx2] = Object.assign({}, DEMO.sites[sidx2], b, { id: parseInt(smt[1]), projectId: b.projectId !== undefined ? (b.projectId ? parseInt(b.projectId) : null) : DEMO.sites[sidx2].projectId, updated_at: now });
+        return resp(0, DEMO.sites[sidx2], '工地联系已更新');
+      }
+      if (m === 'DELETE'){ DEMO.sites.splice(sidx2, 1); return resp(0, null, '工地联系已删除'); }
+    }
+
+    // ---- 站点配置 ----
+    if (r.path === '/api/v1/admin/site-config' && m === 'GET') return resp(0, DEMO['site-config']);
+    if (r.path === '/api/v1/admin/site-config' && m === 'PUT'){
+      DEMO['site-config'] = Object.assign({}, DEMO['site-config'], b);
+      return resp(0, DEMO['site-config'], '站点配置已保存');
+    }
+
+    // ---- 上传（演示占位图） ----
+    if (r.path === '/api/v1/admin/upload' && m === 'POST')
+      return resp(0, ['https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80'], '上传成功（演示占位图）');
+
+    return resp(404, null, '演示版未覆盖接口: ' + r.path);
+  }
+  window.fetch = function(url, opt){ return handle(parseReq(url, opt)); };
+
+  // 演示徽标
+  window.addEventListener('DOMContentLoaded', function(){
+    var badge = document.createElement('div');
+    badge.style.cssText = 'position:fixed;left:14px;bottom:14px;z-index:9999;background:#C73E3A;color:#fff;font-size:12px;line-height:1;padding:8px 12px;border-radius:9999px;box-shadow:0 6px 18px -6px rgba(0,0,0,.35);opacity:.94';
+    badge.textContent = '静态演示版 · 免登录 · 改动仅本次会话有效';
+    document.body.appendChild(badge);
+  });
+})();
+</script>
+
+  <!-- ================= 登录视图 ================= -->
+  <div id="loginView" class="min-h-screen flex items-center justify-center px-4" style="background:linear-gradient(135deg,#FFFDF6,#F9F3E6);">
+    <div class="card w-full max-w-sm p-8 shadow-sm">
+      <div class="flex items-center gap-3 mb-1">
+        <span class="w-11 h-11 rounded-2xl flex items-center justify-center text-2xl" style="background:linear-gradient(135deg,#FCE9A6,#F7D06A);">🏠</span>
+        <div>
+          <h1 class="font-serif text-xl font-bold">栖屿设计</h1>
+          <p class="text-xs text-[#9A8C75]">后台管理系统 · 轻量 CMS</p>
+        </div>
+      </div>
+      <p class="text-sm text-[#9A8C75] mt-5">运营管理员登录</p>
+      <form id="loginForm" class="mt-3 space-y-3">
+        <input id="username" class="input" placeholder="账号" autocomplete="username" value="admin" />
+        <input id="password" type="password" class="input" placeholder="密码" autocomplete="current-password" value="admin123" />
+        <button type="submit" class="btn-yolk w-full py-2.5 rounded-xl font-medium cursor-pointer">登 录</button>
+        <p class="text-xs text-[#9A8C75] text-center">默认账号 admin / 密码 admin123（请尽快修改）</p>
+        <p id="loginErr" class="text-xs text-red-500 text-center hidden"></p>
+      </form>
+      <p class="text-xs text-[#9A8C75] mt-4 text-center"><a href="/site/index-v7.html" target="_blank" class="hover:underline">🌐 查看前台网站</a></p>
+    </div>
+  </div>
+
+  <!-- ================= 主应用视图 ================= -->
+  <div id="appView" class="hidden min-h-screen flex">
+    <aside class="sidebar fixed left-0 top-0 h-full bg-white border-r border-[#ECE3D2] flex flex-col p-4 z-20">
+      <div class="flex items-center gap-2 px-2 pb-4 mb-2 border-b border-[#ECE3D2]">
+        <span class="w-9 h-9 rounded-xl flex items-center justify-center text-lg" style="background:linear-gradient(135deg,#FCE9A6,#F7D06A);">🏠</span>
+        <span class="font-serif font-bold">栖屿设计</span>
+      </div>
+      <nav class="flex-1 space-y-1 text-sm overflow-y-auto pr-1" id="sideNav">
+        <a class="nav-item active flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="overview"><span class="dot"></span>概览</a>
+
+        <p class="nav-group-label px-3 pt-4 pb-1 text-xs text-[#B6A98E] font-medium tracking-wide" data-group-label="content" data-nav-toggle="content"><span class="nav-caret">▾</span>内容管理</p>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="cases" data-group="content"><span class="dot"></span>案例管理</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="packages" data-group="content"><span class="dot"></span>套餐管理</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="news" data-group="content"><span class="dot"></span>新闻管理</a>
+
+        <p class="nav-group-label px-3 pt-4 pb-1 text-xs text-[#B6A98E] font-medium tracking-wide" data-group-label="customer" data-nav-toggle="customer"><span class="nav-caret">▾</span>客户管理</p>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="messages" data-kind="message" data-group="customer"><span class="dot"></span>留言处理</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="messages" data-kind="appointment" data-group="customer"><span class="dot"></span>预约处理</a>
+
+        <p class="nav-group-label px-3 pt-4 pb-1 text-xs text-[#B6A98E] font-medium tracking-wide" data-group-label="biz" data-nav-toggle="biz"><span class="nav-caret">▾</span>业务管理</p>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="projects" data-group="biz"><span class="dot"></span>项目管理</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="team" data-group="biz"><span class="dot"></span>团队</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="sites" data-group="biz"><span class="dot"></span>工地联系</a>
+
+        <p class="nav-group-label px-3 pt-4 pb-1 text-xs text-[#B6A98E] font-medium tracking-wide" data-group-label="hr" data-nav-toggle="hr"><span class="nav-caret">▾</span>人力与资源</p>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="careers" data-group="hr"><span class="dot"></span>招聘管理</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="accounts" data-group="hr"><span class="dot"></span>用户管理</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="departments" data-group="hr"><span class="dot"></span>部门管理</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="login-logs" data-group="hr"><span class="dot"></span>登录日志</a>
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer" data-page="site" data-group="hr"><span class="dot"></span>网站设置</a>
+      </nav>
+      <button id="logoutBtn" class="nav-item flex items-center gap-3 px-3 py-2.5 cursor-pointer text-[#9A8C75]"><span class="dot"></span>退出登录</button>
+    </aside>
+
+    <div class="flex-1 ml-[232px] flex flex-col">
+      <header class="sticky top-0 bg-[#FFFDF6]/90 backdrop-blur border-b border-[#ECE3D2] px-7 py-4 flex items-center justify-between z-10">
+        <h2 id="pageTitle" class="font-serif text-2xl font-bold">数据概览</h2>
+        <div class="text-sm text-[#9A8C75] flex items-center gap-4">
+          <a href="/site/index-v7.html" target="_blank" class="btn-yolk px-3.5 py-1.5 rounded-xl text-xs font-medium cursor-pointer no-underline">🌐 查看前台</a>
+          <span><span id="whoRole" class="badge badge-blue">管理员</span> · <span id="who">admin</span></span>
+        </div>
+      </header>
+      <main class="flex-1 p-7" id="pageContainer"></main>
+    </div>
+  </div>
+
+  <!-- 模态框 & Toast 容器 -->
+  <div id="modalRoot"></div>
+  <div id="toast" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
+
+  <script>
+  /* ====================== 基础工具 ====================== */
+  const API = '';
+  let TOKEN = localStorage.getItem('qiyu_token') || '';
+  let ROLE = localStorage.getItem('qiyu_role') || '';
+  let NAME = localStorage.getItem('qiyu_name') || '';
+  const ROLE_LABELS = { admin: '管理员', sales: '销售', design: '设计', cs: '客服' };
+  const PAGE_ROLES = {
+    overview: ['admin', 'sales', 'design', 'cs'], cases: ['admin', 'sales', 'design'],
+    packages: ['admin', 'sales', 'design'], news: ['admin', 'design'],
+    messages: ['admin', 'sales', 'cs'], careers: ['admin', 'design'],
+    projects: ['admin', 'sales', 'design', 'cs'], team: ['admin', 'sales', 'design', 'cs'], sites: ['admin', 'sales', 'design', 'cs'],
+    site: ['admin'], accounts: ['admin'], departments: ['admin'], 'login-logs': ['admin']
+  };
+  const WRITE_ROLES = {
+    cases: ['admin', 'design'], packages: ['admin', 'design'],
+    news: ['admin', 'design'], careers: ['admin', 'design'],
+    messages: ['admin', 'sales', 'cs'], site: ['admin'], accounts: ['admin'], departments: ['admin'], 'login-logs': ['admin'],
+    projects: ['admin', 'sales', 'design'], team: ['admin', 'design'], sites: ['admin', 'sales', 'design']
+  };
+  const canWrite = (page) => (WRITE_ROLES[page] || []).includes(ROLE);
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+  function api(method, path, body, isForm){
+    const opt = { method, headers: {} };
+    if (TOKEN) opt.headers['Authorization'] = 'Bearer ' + TOKEN;
+    if (body !== undefined) {
+      if (isForm) { opt.body = body; }
+      else { opt.headers['Content-Type'] = 'application/json'; opt.body = JSON.stringify(body); }
+    }
+    return fetch(API + path, opt).then(r => r.json().then(d => ({ ok:r.ok, status:r.status, d })));
+  }
+  function toast(msg, type){
+    const c = type==='err' ? '#C0392B' : '#3C8C4E';
+    const el = document.createElement('div');
+    el.className = 'toast text-white text-sm px-4 py-2.5 rounded-xl shadow';
+    el.style.background = c; el.textContent = msg;
+    $('#toast').appendChild(el);
+    setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }, 2600);
+  }
+  function statusBadge(s){
+    const map = { published:['已上架','badge-green'], draft:['草稿','badge-gray'], offline:['已下架','badge-amber'],
+      new:['未跟进','badge-blue'], contacted:['已联系','badge-amber'], converted:['已成交','badge-green'], closed:['已关闭','badge-red'] };
+    const [t,cls] = map[s] || [s,'badge-gray'];
+    return '<span class="badge '+cls+'">'+t+'</span>';
+  }
+
+  /* ====================== 登录 / 路由 ====================== */
+  $('#loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const r = await api('POST','/api/v1/admin/login', { username:$('#username').value, password:$('#password').value });
+    if (r.ok && r.d.code===0) {
+      TOKEN = r.d.data.token; localStorage.setItem('qiyu_token', TOKEN);
+      ROLE = r.d.data.role; NAME = r.d.data.name || r.d.data.username;
+      localStorage.setItem('qiyu_role', ROLE); localStorage.setItem('qiyu_name', NAME);
+      enterApp();
+    } else { $('#loginErr').textContent = (r.d && r.d.message) || '登录失败'; $('#loginErr').classList.remove('hidden'); }
+  });
+  $('#logoutBtn').addEventListener('click', () => {
+    openModal('退出登录', '<p class="text-sm text-[#9A8C75]">确定要退出当前内部账号吗？退出后需重新登录才能管理内容。</p>', () => {
+      TOKEN=''; ROLE=''; NAME='';
+      localStorage.removeItem('qiyu_token'); localStorage.removeItem('qiyu_role'); localStorage.removeItem('qiyu_name');
+      $('#appView').classList.add('hidden');
+      $('#loginView').classList.remove('hidden');
+      $('#password').value='';
+      $('#username').focus();
+      return true;
+    });
+  });
+  $$('#sideNav .nav-item').forEach(a => a.addEventListener('click', () => {
+    if (a.dataset.kind) currentMsgKind = a.dataset.kind;
+    navigate(a.dataset.page);
+  }));
+  /* 侧边栏分组折叠：点击二级标题收回/展开其下子项，状态存 localStorage */
+  function applyNavCollapse(){
+    let collapsed = [];
+    try { collapsed = JSON.parse(localStorage.getItem('qiyu_nav_collapsed') || '[]'); } catch(e){}
+    $$('#sideNav [data-nav-toggle]').forEach(lbl => {
+      const g = lbl.dataset.navToggle;
+      const on = collapsed.indexOf(g) >= 0;
+      lbl.classList.toggle('collapsed', on);
+      $$('#sideNav [data-group="'+g+'"]').forEach(a => a.classList.toggle('nav-collapsed', on));
+    });
+  }
+  $$('#sideNav [data-nav-toggle]').forEach(lbl => lbl.addEventListener('click', () => {
+    let collapsed = [];
+    try { collapsed = JSON.parse(localStorage.getItem('qiyu_nav_collapsed') || '[]'); } catch(e){}
+    const g = lbl.dataset.navToggle;
+    const i = collapsed.indexOf(g);
+    if (i >= 0) collapsed.splice(i, 1); else collapsed.push(g);
+    try { localStorage.setItem('qiyu_nav_collapsed', JSON.stringify(collapsed)); } catch(e){}
+    applyNavCollapse();
+  }));
+  applyNavCollapse();
+  // 当前留言模块类型（留言处理 / 预约处理）
+  let currentMsgKind = 'appointment';
+  // 概览卡片点击 → 跳转到对应管理页（带筛选条件）
+  function gotoPage(key){
+    const [page, arg] = key.split(':');
+    if (page==='cases') caseFilters = { category:'all', status:arg||'all', q:'', page:1, sort:'new' };
+    else if (page==='packages') pkgFilters = { type:'all', status:arg||'all', q:'', page:1 };
+    else if (page==='news') newsFilters = { tag:'all', status:arg||'all', q:'', page:1 };
+    else if (page==='careers') careerFilters = { category:'all', status:arg||'all', q:'', page:1 };
+    else if (page==='messages'){
+      if (arg==='message' || arg==='appointment'){ currentMsgKind = arg; msgFilters = { status:'all', source:'all', q:'', page:1 }; }
+      else { currentMsgKind = 'appointment'; msgFilters = { status:arg||'all', source:'all', q:'', page:1 }; }
+    }
+    navigate(page);
+  }
+
+  function applyRoleNav(){
+    const visibleByGroup = {};
+    $$('#sideNav .nav-item[data-page]').forEach(a => {
+      const show = (PAGE_ROLES[a.dataset.page] || []).includes(ROLE);
+      a.style.display = show ? '' : 'none';
+      const g = a.dataset.group; if (g) visibleByGroup[g] = visibleByGroup[g] || show;
+    });
+    ['content','customer','biz','hr'].forEach(g => {
+      const lbl = $('#sideNav [data-group-label="'+g+'"]');
+      if (lbl) lbl.style.display = visibleByGroup[g] ? '' : 'none';
+    });
+  }
+  function renderWho(){
+    const w = $('#whoRole'); if (w) w.textContent = ROLE_LABELS[ROLE] || ROLE || '—';
+    const n = $('#who'); if (n) n.textContent = NAME || '(未命名)';
+  }
+  function enterApp(){ $('#loginView').classList.add('hidden'); $('#appView').classList.remove('hidden'); applyRoleNav(); renderWho(); navigate('overview'); }
+  function navigate(page){
+    if (!(PAGE_ROLES[page] || []).includes(ROLE)) { toast('当前角色无权限访问该模块', 'err'); page = 'overview'; }
+    $$('#sideNav .nav-item').forEach(a => a.classList.toggle('active', a.dataset.page===page && (a.dataset.kind||'')===(page==='messages'?currentMsgKind:'')));
+    const titles = { overview:'概览', cases:'案例管理', packages:'套餐管理', news:'新闻管理', careers:'招聘管理', accounts:'用户管理', departments:'部门管理', 'login-logs':'登录日志', site:'网站设置', projects:'项目管理', team:'团队', sites:'工地联系' };
+    let title = titles[page] || '';
+    if (page==='messages') title = currentMsgKind==='message' ? '留言处理' : '预约处理';
+    $('#pageTitle').textContent = title;
+    ({ overview:renderOverview, cases:renderCases, packages:renderPackages, news:renderNews, careers:renderCareers, messages:renderMessages, accounts:renderAccounts, departments:renderDepartments, 'login-logs':renderLoginLogs, site:renderSite, projects:renderProjects, team:renderTeam, sites:renderSites })[page]();
+  }
+  if (TOKEN) { try { api('GET','/api/v1/admin/overview').then(r=>{ if(r.ok) enterApp(); else { TOKEN='';localStorage.removeItem('qiyu_token'); } }); } catch(e){} }
+  else { $('#loginView').classList.remove('hidden'); $('#username').focus(); }
+
+  /* ====================== 概览（仪表盘） ====================== */
+  function deltaBadge(delta){
+    if (delta > 0) return `<span class="inline-flex items-center gap-1 text-xs font-medium text-[#3C8C4E] bg-[#E7F4E8] px-2 py-0.5 rounded-full">▲ +${delta} 较上月</span>`;
+    if (delta < 0) return `<span class="inline-flex items-center gap-1 text-xs font-medium text-[#C0392B] bg-[#FBE3E3] px-2 py-0.5 rounded-full">▼ ${delta} 较上月</span>`;
+    return `<span class="inline-flex items-center gap-1 text-xs font-medium text-[#9A8C75] bg-[#EFEAE0] px-2 py-0.5 rounded-full">— 与上月持平</span>`;
+  }
+  function cmpBar(t, l){
+    const max = Math.max(t, l, 1);
+    const tw = Math.round(t/max*100), lw = Math.round(l/max*100);
+    return `<div class="mt-3 space-y-1.5">
+      <div class="flex items-center gap-2 text-xs text-[#9A8C75]"><span class="w-9">本月</span><div class="flex-1 h-2 rounded-full bg-[#E7F4E8] overflow-hidden"><div class="h-full bg-[#3C8C4E]" style="width:${tw}%"></div></div><span class="w-6 text-right tabular-nums">${t}</span></div>
+      <div class="flex items-center gap-2 text-xs text-[#9A8C75]"><span class="w-9">上月</span><div class="flex-1 h-2 rounded-full bg-[#EFEAE0] overflow-hidden"><div class="h-full bg-[#B6A98E]" style="width:${lw}%"></div></div><span class="w-6 text-right tabular-nums">${l}</span></div>
+    </div>`;
+  }
+  function kpiCard(title, total, thisMonth, lastMonth, delta, goto){
+    return `<div class="card p-5 ${goto?'cursor-pointer hover:-translate-y-0.5 hover:shadow-md transition':''}" ${goto?`onclick="gotoPage('${goto}')"`:''}>
+      <div class="flex items-start justify-between gap-2">
+        <p class="text-sm text-[#9A8C75]">${title}</p>
+        ${deltaBadge(delta)}
+      </div>
+      <p class="font-serif text-4xl font-bold mt-2">${total}</p>
+      <p class="text-xs text-[#9A8C75] mt-1">本月新增 ${thisMonth} · 上月 ${lastMonth}</p>
+      ${cmpBar(thisMonth, lastMonth)}
+      ${goto?`<p class="text-xs text-[#2F6DB5] mt-3">点击查看明细 →</p>`:''}
+    </div>`;
+  }
+  async function renderOverview(){
+    const r = await api('GET','/api/v1/admin/overview');
+    if (!r.ok) return;
+    const d = r.d.data;
+    $('#pageContainer').innerHTML = `
+      <p class="text-sm text-[#9A8C75] mb-4">📊 数据概览仪表盘 · 环比基于记录创建时间（本月 vs 上月）。点击卡片可跳转对应管理模块。</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        ${kpiCard('案例总数', d.caseTotal, d.caseThisMonth, d.caseLastMonth, d.caseDelta, 'cases')}
+        ${kpiCard('套餐总数', d.packageTotal, d.packageThisMonth, d.packageLastMonth, d.packageDelta, 'packages')}
+        ${kpiCard('留言总数', d.messageTotal, d.messageThisMonth, d.messageLastMonth, d.messageDelta, 'messages:appointment')}
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-5">
+        ${miniCard('上架案例', d.casePublished, 'badge-green', 'cases:published')}
+        ${miniCard('上架套餐', d.packagePublished, 'badge-green', 'packages:published')}
+        ${miniCard('新闻总数', d.newsTotal, 'badge-blue', 'news')}
+        ${miniCard('招聘岗位', d.careerTotal, 'badge-green', 'careers')}
+        ${miniCard('内部账号', d.accountTotal, 'badge-gray', 'accounts')}
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-5">
+        <div class="card p-6">
+          <h3 class="font-serif text-lg font-bold mb-1">留言 / 预约构成</h3>
+          <p class="text-xs text-[#9A8C75] mb-4">客户管理模块下按类型拆分，点击进入对应列表</p>
+          <div class="grid grid-cols-2 gap-3">
+            ${miniCard('预约处理', d.messageByKind.appointment, 'badge-amber', 'messages:appointment')}
+            ${miniCard('留言处理', d.messageByKind.message, 'badge-blue', 'messages:message')}
+          </div>
+        </div>
+        <div class="card p-6">
+          <h3 class="font-serif text-lg font-bold mb-1">留言线索状态分布</h3>
+          <p class="text-xs text-[#9A8C75] mb-4">点击查看对应状态（预约处理视图）</p>
+          <div class="grid grid-cols-2 gap-3">
+            ${miniCard('未跟进', d.messageByStatus.new, 'badge-blue', 'messages:new')}
+            ${miniCard('已联系', d.messageByStatus.contacted, 'badge-amber', 'messages:contacted')}
+            ${miniCard('已成交', d.messageByStatus.converted, 'badge-green', 'messages:converted')}
+            ${miniCard('已关闭', d.messageByStatus.closed, 'badge-red', 'messages:closed')}
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
+        ${miniCard('项目总数', d.projectTotal, 'badge-blue', 'projects')}
+        ${miniCard('进行中项目', d.projectActive, 'badge-amber', 'projects')}
+        ${miniCard('团队人数', d.teamTotal, 'badge-green', 'team')}
+        ${miniCard('工地联系', d.siteTotal, 'badge-gray', 'sites')}
+      </div>
+
+      <h3 class="font-serif text-lg font-bold mt-7 mb-1">📈 数据可视化看板</h3>
+      <p class="text-xs text-[#9A8C75] mb-3">项目状态分布、近 6 个月新增趋势与设计师项目排行（数据来自各业务模块）。</p>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="card p-6">
+          <h4 class="font-medium mb-3">项目状态分布</h4>
+          ${svgDonut(d.projectByStatus)}
+        </div>
+        <div class="card p-6">
+          <h4 class="font-medium mb-3">近 6 个月新增（项目 / 预约）</h4>
+          ${svgBars(d.monthlyTrend)}
+        </div>
+      </div>
+      <div class="card p-6 mt-4">
+        <h4 class="font-medium mb-3">设计师项目排行榜</h4>
+        ${svgHBars(d.designerLeaderboard)}
+      </div>
+
+      <p class="text-xs text-[#9A8C75] mt-5">北极星指标：月度有效线索 = 状态非「已关闭」的留言量，当前 <b>${d.messageTotal - d.messageByStatus.closed}</b> 条。</p>`;
+  }
+  function miniCard(t,v,cls,goto){
+    return `<div class="card p-4 flex items-center justify-between cursor-pointer hover:shadow-md transition" ${goto?`onclick="gotoPage('${goto}')"`:''}>
+      <span class="text-sm text-[#9A8C75]">${t}</span>
+      <span class="badge ${cls}">${v}</span>
+    </div>`;
+  }
+
+  /* ====================== 数据可视化（自包含 SVG，无外部依赖） ====================== */
+  const PROJECT_STATUS = {
+    lead:        { label: '线索/预约', color: '#9A8C75' },
+    measuring:   { label: '量房中',   color: '#2F6DB5' },
+    designing:   { label: '方案设计', color: '#7E57C2' },
+    quoting:     { label: '报价中',   color: '#E0A458' },
+    signed:      { label: '已签约',   color: '#3C8C4E' },
+    constructing:{ label: '施工中',   color: '#C0732B' },
+    acceptance:  { label: '验收中',   color: '#2F8F9D' },
+    done:        { label: '已结案',   color: '#4A3F30' },
+    cancelled:   { label: '已流失',   color: '#C0392B' }
+  };
+  function svgDonut(statusObj){
+    const segs = Object.keys(PROJECT_STATUS).map(k => ({ key:k, label:PROJECT_STATUS[k].label, color:PROJECT_STATUS[k].color, value: (statusObj && statusObj[k]) || 0 })).filter(s => s.value > 0);
+    const total = segs.reduce((a, s) => a + s.value, 0);
+    if (!total) return '<p class="text-sm text-[#9A8C75]">暂无项目数据</p>';
+    const C = 2 * Math.PI * 46;
+    let acc = 0;
+    const arcs = segs.map(s => {
+      const dash = s.value / total * C;
+      const arc = `<circle cx="60" cy="60" r="46" fill="none" stroke="${s.color}" stroke-width="16" stroke-dasharray="${dash.toFixed(2)} ${(C-dash).toFixed(2)}" stroke-dashoffset="${(-acc).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
+      acc += dash;
+      return arc;
+    }).join('');
+    const legend = segs.map(s => `<div class="flex items-center gap-2 text-xs"><span class="w-2.5 h-2.5 rounded-full" style="background:${s.color}"></span><span class="text-[#9A8C75]">${s.label}</span><span class="ml-auto font-medium tabular-nums">${s.value}</span></div>`).join('');
+    return `<div class="flex items-center gap-5">
+      <svg viewBox="0 0 120 120" width="120" height="120" class="shrink-0">
+        ${arcs}
+        <text x="60" y="56" font-size="20" font-weight="bold" text-anchor="middle" fill="#4A3F30">${total}</text>
+        <text x="60" y="72" font-size="9" text-anchor="middle" fill="#9A8C75">项目总数</text>
+      </svg>
+      <div class="flex-1 grid grid-cols-1 gap-1.5">${legend}</div>
+    </div>`;
+  }
+  function svgBars(trend){
+    if (!trend || !trend.length) return '<p class="text-sm text-[#9A8C75]">暂无数据</p>';
+    const max = Math.max(1, ...trend.map(t => Math.max(t.projects, t.appointments)));
+    const W = 380, H = 170, base = 130, bw = 13, gap = 4, step = 60;
+    const bars = trend.map((t, i) => {
+      const x = 14 + i * step;
+      const hp = Math.round(t.projects / max * 100);
+      const ha = Math.round(t.appointments / max * 100);
+      return `<rect x="${x}" y="${base-hp}" width="${bw}" height="${hp}" rx="2" fill="#3C8C4E"/>
+        <rect x="${x+bw+gap}" y="${base-ha}" width="${bw}" height="${ha}" rx="2" fill="#2F6DB5"/>
+        <text x="${x+bw}" y="${base+14}" font-size="9" fill="#9A8C75" text-anchor="middle">${t.month.slice(2)}</text>`;
+    }).join('');
+    return `<div class="flex items-center gap-4">
+      <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">
+        <line x1="10" y1="${base}" x2="${W-10}" y2="${base}" stroke="#ECE3D2"/>
+        ${bars}
+      </svg>
+      <div class="text-xs space-y-1 shrink-0">
+        <div><span class="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style="background:#3C8C4E"></span>新增项目</div>
+        <div><span class="inline-block w-3 h-3 rounded-sm mr-1 align-middle" style="background:#2F6DB5"></span>新增预约</div>
+      </div>
+    </div>`;
+  }
+  function svgHBars(list){
+    if (!list || !list.length) return '<p class="text-sm text-[#9A8C75]">暂无数据</p>';
+    const max = Math.max(1, ...list.map(x => x.count));
+    return `<div class="space-y-2">${list.map(x => {
+      const w = Math.round(x.count / max * 100);
+      return `<div class="flex items-center gap-3 text-sm">
+        <span class="w-24 truncate text-[#9A8C75]">${esc(x.name)}</span>
+        <div class="flex-1 h-4 rounded-full bg-[#EFEAE0] overflow-hidden"><div class="h-full bg-[#4A3F30]" style="width:${w}%"></div></div>
+        <span class="w-6 text-right tabular-nums">${x.count}</span>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  /* ====================== 案例管理 ====================== */
+  var caseFilters = { category:'all', status:'all', q:'', page:1, sort:'new' };
+  async function renderCases(){
+    const q = new URLSearchParams(caseFilters).toString();
+    const r = await api('GET','/api/v1/admin/cases?'+q);
+    if (!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    const catLabel = { private:'私宅', small:'小户型', apartment:'公寓改造' };
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="fCat" class="sel w-auto">${opt([['all','全部分类'],['private','私宅'],['small','小户型'],['apartment','公寓改造']], caseFilters.category)}</select>
+        <select id="fStatus" class="sel w-auto">${opt([['all','全部状态'],['published','已上架'],['draft','草稿'],['offline','已下架']], caseFilters.status)}</select>
+        <input id="fQ" class="input w-56" placeholder="搜索标题/设计师" value="${caseFilters.q}" />
+        <select id="fSort" class="sel w-auto">${opt([['new','最新'],['hot','最热']], caseFilters.sort)}</select>
+        <button id="fSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+        ${canWrite('cases') ? '<button id="addCase" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增案例</button>' : ''}
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left">
+            <th class="p-3">封面</th><th class="p-3">标题</th><th class="p-3">分类</th><th class="p-3">风格/户型</th>
+            <th class="p-3">面积</th><th class="p-3">参考价</th><th class="p-3">精选</th><th class="p-3">状态</th><th class="p-3">浏览</th><th class="p-3">操作</th>
+          </tr></thead>
+          <tbody>${items.map(rowCase).join('') || '<tr><td colspan="10" class="p-6 text-center text-[#9A8C75]">暂无案例</td></tr>'}</tbody>
+        </table>
+      </div>
+      ${pager(total, page, pageSize, 'caseFilters')}`;
+    bindCaseEvents();
+  }
+  function rowCase(c){
+    return `<tr class="border-t border-[#F0E7D6]">
+      <td class="p-3"><img class="thumb" src="${c.cover||'https://placehold.co/74'}" alt=""></td>
+      <td class="p-3 font-medium">${esc(c.title)}</td>
+      <td class="p-3">${{private:'私宅',small:'小户型',apartment:'公寓改造'}[c.category]||c.category}</td>
+      <td class="p-3 text-xs text-[#9A8C75]">${(c.style_tags||[]).join('/')}<br>${(c.house_type_tags||[]).join('/')}</td>
+      <td class="p-3">${c.area||'-'}㎡</td>
+      <td class="p-3 text-xs">${c.price_per_sqm?('¥'+c.price_per_sqm+'/㎡'):'—'}</td>
+      <td class="p-3">${c.is_featured?'✅':'—'}</td>
+      <td class="p-3">${statusBadge(c.status)}</td>
+      <td class="p-3">${c.view_count||0}</td>
+      <td class="p-3 whitespace-nowrap">
+        ${canWrite('cases') ? `
+        ${c.status==='published'
+          ? `<button class="text-[#C0392B] hover:underline mr-2" data-shelf="${c.id}:offline">下架</button>`
+          : `<button class="text-[#3C8C4E] hover:underline mr-2" data-shelf="${c.id}:publish">上架</button>`}
+        <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${c.id}">编辑</button>
+        <button class="text-[#C0392B] hover:underline" data-del="${c.id}">删除</button>` : '<span class="text-[#9A8C75]">只读</span>'}
+      </td></tr>`;
+  }
+  function bindCaseEvents(){
+    $('#fSearch').onclick = () => { caseFilters.category=$('#fCat').value; caseFilters.status=$('#fStatus').value; caseFilters.q=$('#fQ').value; caseFilters.sort=$('#fSort').value; caseFilters.page=1; renderCases(); };
+    $('#addCase').onclick = () => openCaseModal(null);
+    $$('[data-edit]').forEach(b => b.onclick = () => openCaseModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('确定删除该案例？此操作不可恢复。')) return;
+      const r = await api('DELETE','/api/v1/admin/cases/'+b.dataset.del);
+      toast(r.d.code===0?'已删除':(r.d.message||'删除失败'), r.d.code===0?'ok':'err'); if(r.d.code===0) renderCases();
+    });
+    $$('[data-shelf]').forEach(b => b.onclick = async () => {
+      const [id, action] = b.dataset.shelf.split(':');
+      const newStatus = action === 'publish' ? 'published' : 'offline';
+      const r = await api('PATCH','/api/v1/admin/cases/'+id, { status:newStatus });
+      toast(r.d.code===0 ? (newStatus==='published'?'已上架':'已下架') : (r.d.message||'操作失败'), r.d.code===0?'ok':'err');
+      if (r.d.code===0) renderCases();
+    });
+    bindPager('caseFilters', renderCases);
+  }
+
+  /* 案例编辑模态框 */
+  async function openCaseModal(id){
+    let c = { category:'private', status:'draft', style_tags:[], house_type_tags:[], area_range:'60-90', is_featured:false };
+    if (id) { const r = await api('GET','/api/v1/admin/cases?q=&page=1&pageSize=999'); c = ((r.d.data.items || r.d.data).find(x=>x.id===id)) || c; }
+    let cover = c.cover || '';
+    let gallery = (c.gallery || []).slice();
+    const html = `
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">标题 *<input id="m_title" class="input mt-1" value="${esc(c.title||'')}"></label>
+          <label class="block">slug<input id="m_slug" class="input mt-1" value="${esc(c.slug||'')}" placeholder="留空自动生成"></label>
+          <label class="block">业务分类 *<select id="m_cat" class="sel mt-1">${opt([['private','私宅'],['small','小户型'],['apartment','公寓改造']],c.category)}</select></label>
+          <label class="block">状态<select id="m_status" class="sel mt-1">${opt([['draft','草稿'],['published','已上架'],['offline','已下架']],c.status)}</select></label>
+        </div>
+        <div>
+          <p class="text-sm font-medium">封面图</p>
+          <div class="flex items-center gap-3 mt-1">
+            <img id="m_coverPrev" class="thumb" src="${cover||'https://placehold.co/74'}" alt="">
+            <input id="m_coverFile" type="file" accept="image/*" class="text-sm">
+            <button id="m_coverUp" type="button" class="btn-yolk px-3 py-1.5 rounded-lg text-sm cursor-pointer">上传</button>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm font-medium">图集（多图）</p>
+          <div id="m_galPrev" class="flex flex-wrap gap-2 mt-1">${gallery.map((g,i)=>`<div class="relative"><img class="thumb" src="${g}"><button type="button" class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#C0392B] text-white text-xs" data-rm="${i}">×</button></div>`).join('')}</div>
+          <div class="flex items-center gap-3 mt-2">
+            <input id="m_galFile" type="file" accept="image/*" multiple class="text-sm">
+            <button id="m_galUp" type="button" class="btn-yolk px-3 py-1.5 rounded-lg text-sm cursor-pointer">上传图集</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">视频URL<input id="m_video" class="input mt-1" value="${esc(c.video_url||'')}"></label>
+          <label class="block">面积区间<select id="m_area" class="sel mt-1">${opt([['<60','<60㎡'],['60-90','60–90㎡'],['90-120','90–120㎡'],['>120','>120㎡']],c.area_range)}</select></label>
+          <label class="block">面积(㎡)<input id="m_areano" type="number" class="input mt-1" value="${c.area||''}"></label>
+          <label class="block">年份<input id="m_year" type="number" class="input mt-1" value="${c.year||''}"></label>
+          <label class="block">参考单价(元/㎡)<input id="m_price" type="number" class="input mt-1" value="${c.price_per_sqm||''}" placeholder="如 280"></label>
+          <label class="block">地址<input id="m_loc" class="input mt-1" value="${esc(c.location||'')}"></label>
+          <label class="block">主创设计师<input id="m_designer" class="input mt-1" value="${esc(c.designer||'')}"></label>
+          <label class="block">设计机构<input id="m_studio" class="input mt-1" value="${esc(c.studio||'')}"></label>
+          <label class="block">材料说明<input id="m_material" class="input mt-1" value="${esc(c.material_notes||'')}"></label>
+        </div>
+        <label class="block">风格标签（逗号分隔）<input id="m_style" class="input mt-1" value="${esc((c.style_tags||[]).join(','))}"></label>
+        <label class="block">户型标签（逗号分隔）<input id="m_house" class="input mt-1" value="${esc((c.house_type_tags||[]).join(','))}"></label>
+        <label class="block">摘要<textarea id="m_summary" class="ta mt-1" rows="2">${esc(c.summary||'')}</textarea></label>
+        <label class="block">正文<textarea id="m_content" class="ta mt-1" rows="4">${esc(c.content||'')}</textarea></label>
+        <label class="flex items-center gap-2 text-sm"><input id="m_feat" type="checkbox" ${c.is_featured?'checked':''}> 设为首页精选</label>
+      </div>`;
+    openModal(id?'编辑案例':'新增案例', html, async () => {
+      cover = $('#m_coverPrev').src.startsWith('http') && !$('#m_coverPrev').src.includes('placehold') ? cover : cover;
+      const payload = {
+        title:$('#m_title').value, slug:$('#m_slug').value, category:$('#m_cat').value, status:$('#m_status').value,
+        cover, gallery, video_url:$('#m_video').value, area_range:$('#m_area').value, area:+$('#m_areano').value||0, year:+$('#m_year').value||0,
+        price_per_sqm: +$('#m_price').value||0,
+        price_note: '全案设计约 ¥' + ($('#m_price').value||'0') + '/㎡ 起，具体按面积与风格微调',
+        location:$('#m_loc').value, designer:$('#m_designer').value, studio:$('#m_studio').value, material_notes:$('#m_material').value,
+        style_tags:splitCSV($('#m_style').value), house_type_tags:splitCSV($('#m_house').value),
+        summary:$('#m_summary').value, content:$('#m_content').value, is_featured:$('#m_feat').checked
+      };
+      if (!payload.title) { toast('请填写标题','err'); return false; }
+      const r = id ? await api('PUT','/api/v1/admin/cases/'+id, payload) : await api('POST','/api/v1/admin/cases', payload);
+      if (r.d.code===0) { toast(id?'已更新':'已创建'); renderCases(); return true; }
+      toast(r.d.message||'保存失败','err'); return false;
+    });
+    // 图片上传绑定
+    $('#m_coverUp').onclick = async () => {
+      const f = $('#m_coverFile').files[0]; if(!f) return toast('请选择图片','err');
+      const fd = new FormData(); fd.append('images', f);
+      const r = await api('POST','/api/v1/admin/upload', fd, true);
+      if (r.d.code===0){ cover=r.d.data[0]; $('#m_coverPrev').src=cover; toast('封面已上传'); } else toast(r.d.message||'上传失败','err');
+    };
+    $('#m_galUp').onclick = async () => {
+      const fs = $('#m_galFile').files; if(!fs.length) return toast('请选择图片','err');
+      const fd = new FormData(); for(const f of fs) fd.append('images', f);
+      const r = await api('POST','/api/v1/admin/upload', fd, true);
+      if (r.d.code===0){ gallery = gallery.concat(r.d.data); refreshGal(); toast('图集已上传'); } else toast(r.d.message||'上传失败','err');
+    };
+    function refreshGal(){
+      $('#m_galPrev').innerHTML = gallery.map((g,i)=>`<div class="relative"><img class="thumb" src="${g}"><button type="button" class="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#C0392B] text-white text-xs" data-rm="${i}">×</button></div>`).join('');
+      $$('#m_galPrev [data-rm]').forEach(b=>b.onclick=()=>{ gallery.splice(+b.dataset.rm,1); refreshGal(); });
+    }
+    refreshGal();
+  }
+
+  /* ====================== 套餐管理 ====================== */
+  var pkgFilters = { type:'all', status:'all', q:'', page:1 };
+  async function renderPackages(){
+    const q = new URLSearchParams(pkgFilters).toString();
+    const r = await api('GET','/api/v1/admin/packages?'+q);
+    if (!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="fType" class="sel w-auto">${opt([['all','全部类型'],['单空间','单空间'],['整屋','整屋'],['风格','风格']], pkgFilters.type)}</select>
+        <select id="fPStatus" class="sel w-auto">${opt([['all','全部状态'],['published','已上架'],['draft','草稿'],['offline','已下架']], pkgFilters.status)}</select>
+        <input id="fPQ" class="input w-56" placeholder="搜索套餐名" value="${pkgFilters.q}">
+        <button id="fPSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+        ${canWrite('packages') ? '<button id="addPkg" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增套餐</button>' : ''}
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left"><th class="p-3">封面</th><th class="p-3">套餐名</th><th class="p-3">类型</th><th class="p-3">适用户型</th><th class="p-3">单价</th><th class="p-3">起价</th><th class="p-3">状态</th><th class="p-3">操作</th></tr></thead>
+          <tbody>${items.map(rowPkg).join('') || '<tr><td colspan="8" class="p-6 text-center text-[#9A8C75]">暂无套餐</td></tr>'}</tbody>
+        </table>
+      </div>
+      ${pager(total, page, pageSize, 'pkgFilters')}`;
+    bindPkgEvents();
+  }
+  function rowPkg(p){
+    return `<tr class="border-t border-[#F0E7D6]">
+      <td class="p-3"><img class="thumb" src="${p.cover||'https://placehold.co/74'}" alt=""></td>
+      <td class="p-3 font-medium">${esc(p.name)}</td>
+      <td class="p-3"><span class="badge badge-amber">${p.type}</span></td>
+      <td class="p-3 text-xs text-[#9A8C75]">${esc(p.applicable_house_type||'-')}</td>
+      <td class="p-3 text-xs">${p.price_per_sqm?('¥'+p.price_per_sqm+'/㎡'):'—'}</td>
+      <td class="p-3">${p.price_from?('¥'+p.price_from+' 起'):'后台配置'}</td>
+      <td class="p-3">${statusBadge(p.status)}</td>
+      <td class="p-3 whitespace-nowrap">
+        ${canWrite('packages') ? `
+        ${p.status==='published'
+          ? `<button class="text-[#C0392B] hover:underline mr-2" data-shelf="${p.id}:offline">下架</button>`
+          : `<button class="text-[#3C8C4E] hover:underline mr-2" data-shelf="${p.id}:publish">上架</button>`}
+        <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${p.id}">编辑</button>
+        <button class="text-[#C0392B] hover:underline" data-del="${p.id}">删除</button>` : '<span class="text-[#9A8C75]">只读</span>'}
+      </td></tr>`;
+  }
+  function bindPkgEvents(){
+    $('#fPSearch').onclick = () => { pkgFilters.type=$('#fType').value; pkgFilters.status=$('#fPStatus').value; pkgFilters.q=$('#fPQ').value; pkgFilters.page=1; renderPackages(); };
+    $('#addPkg').onclick = () => openPkgModal(null);
+    $$('[data-edit]').forEach(b=>b.onclick=()=>openPkgModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b=>b.onclick=async()=>{ if(!confirm('确定删除该套餐？')) return; const r=await api('DELETE','/api/v1/admin/packages/'+b.dataset.del); toast(r.d.code===0?'已删除':(r.d.message||'失败'),r.d.code===0?'ok':'err'); if(r.d.code===0) renderPackages(); });
+    $$('[data-shelf]').forEach(b=>b.onclick=async()=>{
+      const [id, action] = b.dataset.shelf.split(':');
+      const newStatus = action==='publish' ? 'published' : 'offline';
+      const r = await api('PATCH','/api/v1/admin/packages/'+id, { status:newStatus });
+      toast(r.d.code===0 ? (newStatus==='published'?'已上架':'已下架') : (r.d.message||'操作失败'), r.d.code===0?'ok':'err');
+      if(r.d.code===0) renderPackages();
+    });
+    bindPager('pkgFilters', renderPackages);
+  }
+  async function openPkgModal(id){
+    let p = { type:'单空间', status:'draft' };
+    if (id){ const r = await api('GET','/api/v1/admin/packages?q=&page=1&pageSize=999'); p = ((r.d.data.items || r.d.data).find(x=>x.id===id)) || p; }
+    let cover = p.cover||'';
+    const coef = p.area_step_coefficient || {};
+    const html = `
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">套餐名 *<input id="p_name" class="input mt-1" value="${esc(p.name||'')}"></label>
+          <label class="block">slug<input id="p_slug" class="input mt-1" value="${esc(p.slug||'')}" placeholder="留空自动生成"></label>
+          <label class="block">类型 *<select id="p_type" class="sel mt-1">${opt([['单空间','单空间'],['整屋','整屋'],['风格','风格']],p.type)}</select></label>
+          <label class="block">状态<select id="p_status" class="sel mt-1">${opt([['draft','草稿'],['published','已上架'],['offline','已下架']],p.status)}</select></label>
+        </div>
+        <div class="flex items-center gap-3">
+          <img id="p_coverPrev" class="thumb" src="${cover||'https://placehold.co/74'}" alt="">
+          <input id="p_coverFile" type="file" accept="image/*" class="text-sm">
+          <button id="p_coverUp" type="button" class="btn-yolk px-3 py-1.5 rounded-lg text-sm cursor-pointer">上传封面</button>
+        </div>
+        <label class="block">一句话卖点<textarea id="p_summary" class="ta mt-1" rows="2">${esc(p.summary||'')}</textarea></label>
+        <label class="block">详情描述<textarea id="p_desc" class="ta mt-1" rows="3">${esc(p.description||'')}</textarea></label>
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">适用户型<input id="p_aht" class="input mt-1" value="${esc(p.applicable_house_type||'')}"></label>
+          <label class="block">套餐单价(元/㎡)<input id="p_price_sqm" type="number" class="input mt-1" value="${p.price_per_sqm||''}" placeholder="如 260"></label>
+          <label class="block">起步总价(元)<input id="p_price" type="number" class="input mt-1" value="${p.price_from||''}" placeholder="最低套价"></label>
+        </div>
+        <div>
+          <p class="text-sm font-medium">面积区间阶梯系数（作用于起价）</p>
+          <div class="grid grid-cols-4 gap-2 mt-1">
+            ${['<60','60-90','90-120','>120'].map(k=>`<label class="block text-xs">${k}㎡<input id="coef_${k}" class="input mt-1" value="${coef[k]!==undefined?coef[k]:1}"></label>`).join('')}
+          </div>
+        </div>
+        <label class="block">流程步骤（每行一步）<textarea id="p_steps" class="ta mt-1" rows="4">${esc((p.process_steps||[]).join('\n'))}</textarea></label>
+      </div>`;
+    openModal(id?'编辑套餐':'新增套餐', html, async () => {
+      const sqm = $('#p_price_sqm').value ? +$('#p_price_sqm').value : 0;
+      const fromPrice = $('#p_price').value ? +$('#p_price').value : 0;
+      const payload = {
+        name:$('#p_name').value, slug:$('#p_slug').value, type:$('#p_type').value, status:$('#p_status').value, cover,
+        summary:$('#p_summary').value, description:$('#p_desc').value, applicable_house_type:$('#p_aht').value,
+        price_per_sqm: sqm,
+        price_from: fromPrice,
+        price_note: (sqm ? '约 ¥' + sqm + '/㎡ 起' : '') + (fromPrice ? '，最低 ' + fromPrice + ' 元/套' : ''),
+        area_step_coefficient: { '<60':+$('#coef_<60').value||1, '60-90':+$('#coef_60-90').value||1, '90-120':+$('#coef_90-120').value||1, '>120':+$('#coef_>120').value||1 },
+        process_steps: splitCSV($('#p_steps').value, '\n')
+      };
+      if(!payload.name){ toast('请填写套餐名','err'); return false; }
+      const r = id ? await api('PUT','/api/v1/admin/packages/'+id, payload) : await api('POST','/api/v1/admin/packages', payload);
+      if(r.d.code===0){ toast(id?'已更新':'已创建'); renderPackages(); return true; }
+      toast(r.d.message||'保存失败','err'); return false;
+    });
+    $('#p_coverUp').onclick = async () => {
+      const f=$('#p_coverFile').files[0]; if(!f) return toast('请选择图片','err');
+      const fd=new FormData(); fd.append('images',f);
+      const r=await api('POST','/api/v1/admin/upload',fd,true);
+      if(r.d.code===0){ cover=r.d.data[0]; $('#p_coverPrev').src=cover; toast('封面已上传'); } else toast(r.d.message||'上传失败','err');
+    };
+  }
+
+  /* ====================== 新闻管理 ====================== */
+  var newsFilters = { tag:'all', status:'all', q:'', page:1 };
+  async function renderNews(){
+    const q = new URLSearchParams(newsFilters).toString();
+    const r = await api('GET','/api/v1/admin/news?'+q);
+    if(!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="nFTag" class="sel w-auto">${opt([['all','全部分类'],['企业新闻','企业新闻'],['行业资讯','行业资讯']], newsFilters.tag)}</select>
+        <select id="nFStatus" class="sel w-auto">${opt([['all','全部状态'],['published','已上架'],['draft','草稿'],['offline','已下架']], newsFilters.status)}</select>
+        <input id="nFQ" class="input w-56" placeholder="搜索标题" value="${newsFilters.q}">
+        <button id="nFSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+        ${canWrite('news') ? '<button id="addNews" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增新闻</button>' : ''}
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left"><th class="p-3">封面</th><th class="p-3">标题</th><th class="p-3">分类</th><th class="p-3">日期</th><th class="p-3">状态</th><th class="p-3">操作</th></tr></thead>
+          <tbody>${items.map(rowNews).join('') || '<tr><td colspan="6" class="p-6 text-center text-[#9A8C75]">暂无新闻</td></tr>'}</tbody>
+        </table>
+      </div>
+      ${pager(total, page, pageSize, 'newsFilters')}`;
+    bindNewsEvents();
+  }
+  function rowNews(n){
+    return `<tr class="border-t border-[#F0E7D6]">
+      <td class="p-3"><img class="thumb" src="${n.cover||'https://placehold.co/74'}" alt=""></td>
+      <td class="p-3 font-medium">${esc(n.title)}</td>
+      <td class="p-3"><span class="badge badge-amber">${esc(n.tag||'企业新闻')}</span></td>
+      <td class="p-3 text-xs text-[#9A8C75]">${esc(n.date||'')}</td>
+      <td class="p-3">${statusBadge(n.status)}</td>
+      <td class="p-3 whitespace-nowrap">
+        ${canWrite('news') ? `
+        ${n.status==='published'
+          ? `<button class="text-[#C0392B] hover:underline mr-2" data-shelf="${n.id}:offline">下架</button>`
+          : `<button class="text-[#3C8C4E] hover:underline mr-2" data-shelf="${n.id}:publish">上架</button>`}
+        <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${n.id}">编辑</button>
+        <button class="text-[#C0392B] hover:underline" data-del="${n.id}">删除</button>` : '<span class="text-[#9A8C75]">只读</span>'}
+      </td></tr>`;
+  }
+  function bindNewsEvents(){
+    $('#nFSearch').onclick=()=>{ newsFilters.tag=$('#nFTag').value; newsFilters.status=$('#nFStatus').value; newsFilters.q=$('#nFQ').value; newsFilters.page=1; renderNews(); };
+    $('#addNews').onclick=()=>openNewsModal(null);
+    $$('[data-edit]').forEach(b=>b.onclick=()=>openNewsModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b=>b.onclick=async()=>{ if(!confirm('确定删除该新闻？')) return; const r=await api('DELETE','/api/v1/admin/news/'+b.dataset.del); toast(r.d.code===0?'已删除':(r.d.message||'失败'),r.d.code===0?'ok':'err'); if(r.d.code===0) renderNews(); });
+    $$('[data-shelf]').forEach(b=>b.onclick=async()=>{
+      const [id, action] = b.dataset.shelf.split(':');
+      const newStatus = action==='publish' ? 'published' : 'offline';
+      const r = await api('PATCH','/api/v1/admin/news/'+id, { status:newStatus });
+      toast(r.d.code===0 ? (newStatus==='published'?'已上架':'已下架') : (r.d.message||'操作失败'), r.d.code===0?'ok':'err');
+      if(r.d.code===0) renderNews();
+    });
+    bindPager('newsFilters', renderNews);
+  }
+  async function openNewsModal(id){
+    let n = { tag:'企业新闻', status:'published' };
+    if(id){ const r = await api('GET','/api/v1/admin/news?q=&page=1&pageSize=999'); n = ((r.d.data.items || r.d.data).find(x=>x.id===id)) || n; }
+    let cover = n.cover||'';
+    const html = `
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">标题 *<input id="n_title" class="input mt-1" value="${esc(n.title||'')}"></label>
+          <label class="block">日期<input id="n_date" type="date" class="input mt-1" value="${esc(n.date||'')}"></label>
+          <label class="block">分类<select id="n_tag" class="sel mt-1">${opt([['企业新闻','企业新闻'],['行业资讯','行业资讯']],n.tag)}</select></label>
+          <label class="block">状态<select id="n_status" class="sel mt-1">${opt([['published','已上架'],['draft','草稿'],['offline','已下架']],n.status)}</select></label>
+        </div>
+        <div class="flex items-center gap-3">
+          <img id="n_coverPrev" class="thumb" src="${cover||'https://placehold.co/74'}" alt="">
+          <input id="n_coverFile" type="file" accept="image/*" class="text-sm">
+          <button id="n_coverUp" type="button" class="btn-yolk px-3 py-1.5 rounded-lg text-sm cursor-pointer">上传封面</button>
+        </div>
+        <label class="block">摘要<textarea id="n_summary" class="ta mt-1" rows="2">${esc(n.summary||'')}</textarea></label>
+        <label class="block">正文<textarea id="n_body" class="ta mt-1" rows="4">${esc(n.body||'')}</textarea></label>
+      </div>`;
+    openModal(id?'编辑新闻':'新增新闻', html, async () => {
+      const payload = {
+        title:$('#n_title').value, date:$('#n_date').value||new Date().toISOString().slice(0,10),
+        tag:$('#n_tag').value, status:$('#n_status').value, cover,
+        summary:$('#n_summary').value, body:$('#n_body').value
+      };
+      if(!payload.title){ toast('请填写标题','err'); return false; }
+      const r = id ? await api('PUT','/api/v1/admin/news/'+id, payload) : await api('POST','/api/v1/admin/news', payload);
+      if(r.d.code===0){ toast(id?'已更新':'已创建'); renderNews(); return true; }
+      toast(r.d.message||'保存失败','err'); return false;
+    });
+    $('#n_coverUp').onclick = async () => {
+      const f=$('#n_coverFile').files[0]; if(!f) return toast('请选择图片','err');
+      const fd=new FormData(); fd.append('images',f);
+      const r=await api('POST','/api/v1/admin/upload',fd,true);
+      if(r.d.code===0){ cover=r.d.data[0]; $('#n_coverPrev').src=cover; toast('封面已上传'); } else toast(r.d.message||'上传失败','err');
+    };
+  }
+
+  /* ====================== 招聘管理 ====================== */
+  var careerFilters = { category:'all', status:'all', q:'', page:1 };
+  async function renderCareers(){
+    const q = new URLSearchParams(careerFilters).toString();
+    const r = await api('GET','/api/v1/admin/careers?'+q);
+    if(!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="cFCat" class="sel w-auto">${opt([['all','全部类别'],['social','社会招聘'],['campus','校园招聘']], careerFilters.category)}</select>
+        <select id="cFStatus" class="sel w-auto">${opt([['all','全部状态'],['published','已上架'],['draft','草稿'],['offline','已下架']], careerFilters.status)}</select>
+        <input id="cFQ" class="input w-56" placeholder="搜索岗位名" value="${careerFilters.q}">
+        <button id="cFSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+        ${canWrite('careers') ? '<button id="addCareer" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增岗位</button>' : ''}
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left"><th class="p-3">岗位</th><th class="p-3">类别</th><th class="p-3">类型</th><th class="p-3">地点</th><th class="p-3">状态</th><th class="p-3">操作</th></tr></thead>
+          <tbody>${items.map(rowCareer).join('') || '<tr><td colspan="6" class="p-6 text-center text-[#9A8C75]">暂无岗位</td></tr>'}</tbody>
+        </table>
+      </div>
+      ${pager(total, page, pageSize, 'careerFilters')}`;
+    bindCareerEvents();
+  }
+  function rowCareer(j){
+    return `<tr class="border-t border-[#F0E7D6]">
+      <td class="p-3 font-medium">${esc(j.title)}</td>
+      <td class="p-3"><span class="badge ${j.category==='campus'?'badge-blue':'badge-green'}">${j.category==='campus'?'校园招聘':'社会招聘'}</span></td>
+      <td class="p-3 text-xs text-[#9A8C75]">${esc(j.type||'-')}</td>
+      <td class="p-3 text-xs text-[#9A8C75]">${esc(j.location||'-')}</td>
+      <td class="p-3">${statusBadge(j.status)}</td>
+      <td class="p-3 whitespace-nowrap">
+        ${canWrite('careers') ? `
+        ${j.status==='published'
+          ? `<button class="text-[#C0392B] hover:underline mr-2" data-shelf="${j.id}:offline">下架</button>`
+          : `<button class="text-[#3C8C4E] hover:underline mr-2" data-shelf="${j.id}:publish">上架</button>`}
+        <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${j.id}">编辑</button>
+        <button class="text-[#C0392B] hover:underline" data-del="${j.id}">删除</button>` : '<span class="text-[#9A8C75]">只读</span>'}
+      </td></tr>`;
+  }
+  function bindCareerEvents(){
+    $('#cFSearch').onclick=()=>{ careerFilters.category=$('#cFCat').value; careerFilters.status=$('#cFStatus').value; careerFilters.q=$('#cFQ').value; careerFilters.page=1; renderCareers(); };
+    $('#addCareer').onclick=()=>openCareerModal(null);
+    $$('[data-edit]').forEach(b=>b.onclick=()=>openCareerModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b=>b.onclick=async()=>{ if(!confirm('确定删除该岗位？')) return; const r=await api('DELETE','/api/v1/admin/careers/'+b.dataset.del); toast(r.d.code===0?'已删除':(r.d.message||'失败'),r.d.code===0?'ok':'err'); if(r.d.code===0) renderCareers(); });
+    $$('[data-shelf]').forEach(b=>b.onclick=async()=>{
+      const [id, action] = b.dataset.shelf.split(':');
+      const newStatus = action==='publish' ? 'published' : 'offline';
+      const r = await api('PATCH','/api/v1/admin/careers/'+id, { status:newStatus });
+      toast(r.d.code===0 ? (newStatus==='published'?'已上架':'已下架') : (r.d.message||'操作失败'), r.d.code===0?'ok':'err');
+      if(r.d.code===0) renderCareers();
+    });
+    bindPager('careerFilters', renderCareers);
+  }
+  async function openCareerModal(id){
+    let j = { category:'social', type:'全职', status:'published', icon:'design' };
+    if(id){ const r = await api('GET','/api/v1/admin/careers?q=&page=1&pageSize=999'); j = ((r.d.data.items || r.d.data).find(x=>x.id===id)) || j; }
+    const html = `
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">岗位名 *<input id="c_title" class="input mt-1" value="${esc(j.title||'')}"></label>
+          <label class="block">类别<select id="c_cat" class="sel mt-1">${opt([['social','社会招聘'],['campus','校园招聘']],j.category)}</select></label>
+          <label class="block">类型<input id="c_type" class="input mt-1" value="${esc(j.type||'全职')}"></label>
+          <label class="block">地点<input id="c_loc" class="input mt-1" value="${esc(j.location||'上海 · 徐汇')}"></label>
+          <label class="block">图标<select id="c_icon" class="sel mt-1">${opt([['design','design 设计'],['soft','soft 软装'],['intern','intern 实习'],['media','media 媒体']],j.icon)}</select></label>
+          <label class="block">状态<select id="c_status" class="sel mt-1">${opt([['published','已上架'],['draft','草稿'],['offline','已下架']],j.status)}</select></label>
+        </div>
+        <label class="block">摘要<textarea id="c_summary" class="ta mt-1" rows="2">${esc(j.summary||'')}</textarea></label>
+        <label class="block">职责描述<textarea id="c_desc" class="ta mt-1" rows="3">${esc(j.desc||'')}</textarea></label>
+      </div>`;
+    openModal(id?'编辑岗位':'新增岗位', html, async () => {
+      const payload = {
+        title:$('#c_title').value, category:$('#c_cat').value, type:$('#c_type').value,
+        location:$('#c_loc').value, icon:$('#c_icon').value, status:$('#c_status').value,
+        summary:$('#c_summary').value, desc:$('#c_desc').value
+      };
+      if(!payload.title){ toast('请填写岗位名','err'); return false; }
+      const r = id ? await api('PUT','/api/v1/admin/careers/'+id, payload) : await api('POST','/api/v1/admin/careers', payload);
+      if(r.d.code===0){ toast(id?'已更新':'已创建'); renderCareers(); return true; }
+      toast(r.d.message||'保存失败','err'); return false;
+    });
+  }
+
+  /* ====================== 站点设置（关于我们） ====================== */
+  async function renderSite(){
+    const r = await api('GET','/api/v1/admin/site-config');
+    if(!r.ok) return;
+    const s = r.d.data;
+    const c = s.contact_info || {};
+    $('#pageContainer').innerHTML = `
+      <div class="card p-6 max-w-3xl">
+        <h3 class="font-serif text-lg font-bold mb-1">品牌与关于我们</h3>
+        <p class="text-xs text-[#9A8C75] mb-5">保存后刷新前台「关于我们 / 联系我们」页面即可看到新内容。</p>
+        <div class="space-y-4">
+          <label class="block">品牌简介（品牌故事）<textarea id="s_brand" class="ta mt-1" rows="3">${esc(s.brand_intro||'')}</textarea></label>
+          <label class="block">公司简介（首页标语）<textarea id="s_company" class="ta mt-1" rows="2">${esc(s.company_intro||'')}</textarea></label>
+          <label class="block">服务流程说明<textarea id="s_process" class="ta mt-1" rows="3">${esc(s.process_intro||'')}</textarea></label>
+          <div class="grid grid-cols-2 gap-4 pt-2 border-t border-[#ECE3D2]">
+            <label class="block">联系电话<input id="s_phone" class="input mt-1" value="${esc(c.phone||'')}"></label>
+            <label class="block">电子邮箱<input id="s_email" class="input mt-1" value="${esc(c.email||'')}"></label>
+            <label class="block">公司地址<input id="s_address" class="input mt-1" value="${esc(c.address||'')}"></label>
+            <label class="block">营业时间<input id="s_hours" class="input mt-1" value="${esc(c.business_hours||'')}"></label>
+          </div>
+          <button id="saveSite" class="btn-yolk px-6 py-2.5 rounded-xl font-medium cursor-pointer">保存站点配置</button>
+        </div>
+      </div>`;
+    $('#saveSite').onclick = async () => {
+      const payload = {
+        brand_intro: $('#s_brand').value.trim(),
+        company_intro: $('#s_company').value.trim(),
+        process_intro: $('#s_process').value.trim(),
+        contact_info: {
+          phone: $('#s_phone').value.trim(),
+          email: $('#s_email').value.trim(),
+          address: $('#s_address').value.trim(),
+          business_hours: $('#s_hours').value.trim()
+        }
+      };
+      const r = await api('PUT','/api/v1/admin/site-config', payload);
+      toast(r.d.code===0 ? '站点配置已保存，前台刷新即可生效' : (r.d.message||'保存失败'), r.d.code===0?'ok':'err');
+    };
+  }
+
+  /* ====================== 用户管理（仅管理员） ====================== */
+  var accountFilters = { role:'all', departmentId:'all', gender:'all', active:'all', q:'', page:1, pageSize:10 };
+  async function renderAccounts(){
+    const [r, rd] = await Promise.all([api('GET','/api/v1/admin/accounts?'+new URLSearchParams(accountFilters).toString()), api('GET','/api/v1/admin/departments')]);
+    if(!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    const list = items;
+    const depts = (rd.d && rd.d.data) || [];
+    const deptMap = Object.fromEntries(depts.map(d=>[d.id, d.name]));
+    const roleBadge = { admin:'badge-blue', sales:'badge-green', design:'badge-amber', cs:'badge-gray' };
+    const genderBadge = { male:'badge-blue', female:'badge-amber', other:'badge-gray' };
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="aFRole" class="sel w-auto">${opt([['all','全部角色'],['admin','管理员'],['sales','销售'],['design','设计'],['cs','客服']], accountFilters.role)}</select>
+        <select id="aFDept" class="sel w-auto">${opt([['all','全部部门']].concat(depts.map(d=>[String(d.id), d.name])), accountFilters.departmentId)}</select>
+        <select id="aFGender" class="sel w-auto">${opt([['all','全部性别'],['male','男'],['female','女'],['other','其他']], accountFilters.gender)}</select>
+        <select id="aFActive" class="sel w-auto">${opt([['all','全部状态'],['enabled','启用'],['disabled','禁用']], accountFilters.active)}</select>
+        <input id="aFQ" class="input w-56" placeholder="搜索账号/姓名/电话/身份证" value="${esc(accountFilters.q)}">
+        <button id="aFSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+        <button id="addAccount" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增用户</button>
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left">
+            <th class="p-3">账号</th><th class="p-3">姓名</th><th class="p-3">昵称</th><th class="p-3">性别</th><th class="p-3">部门</th>
+            <th class="p-3">角色</th><th class="p-3">最后登录</th><th class="p-3">电话</th><th class="p-3">身份证</th><th class="p-3">状态</th><th class="p-3">操作</th>
+          </tr></thead>
+          <tbody>${list.map(a=>`
+            <tr class="border-t border-[#F0E7D6]">
+              <td class="p-3 font-medium">${esc(a.username)}</td>
+              <td class="p-3">${esc(a.name||'-')}</td>
+              <td class="p-3 text-[#9A8C75]">${esc(a.nickname||'-')}</td>
+              <td class="p-3"><span class="badge ${genderBadge[a.gender]||'badge-gray'}">${{male:'男',female:'女',other:'其他'}[a.gender]||'-'}</span></td>
+              <td class="p-3">${esc(deptMap[a.departmentId]||'-')}</td>
+              <td class="p-3"><span class="badge ${roleBadge[a.role]||'badge-gray'}">${ROLE_LABELS[a.role]||a.role}</span></td>
+              <td class="p-3 text-xs text-[#9A8C75]">${a.lastLoginAt?fmtTime(a.lastLoginAt):'—'}</td>
+              <td class="p-3 text-xs">${esc(a.phone||'-')}</td>
+              <td class="p-3 text-xs text-[#9A8C75]">${esc(a.idCard?maskIdCard(a.idCard):'-')}</td>
+              <td class="p-3">${a.active?'<span class="badge badge-green">启用</span>':'<span class="badge badge-red">禁用</span>'}</td>
+              <td class="p-3 whitespace-nowrap">
+                <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${a.id}">编辑</button>
+                ${a.username==='admin' ? '' : `<button class="text-[#C0392B] hover:underline" data-del="${a.id}">删除</button>`}
+              </td>
+            </tr>`).join('') || '<tr><td colspan="11" class="p-6 text-center text-[#9A8C75]">暂无用户</td></tr>'}</tbody>
+        </table>
+        ${pager(total, page, pageSize, 'accountFilters')}
+      </div>`;
+    $('#addAccount').onclick = () => openAccountModal(null);
+    $('#aFSearch').onclick = () => {
+      accountFilters.role=$('#aFRole').value; accountFilters.departmentId=$('#aFDept').value;
+      accountFilters.gender=$('#aFGender').value; accountFilters.active=$('#aFActive').value;
+      accountFilters.q=$('#aFQ').value; accountFilters.page=1; renderAccounts();
+    };
+    $$('[data-edit]').forEach(b=>b.onclick=()=>openAccountModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b=>b.onclick=async()=>{
+      if(!confirm('确定删除该账号？')) return;
+      const r2 = await api('DELETE','/api/v1/admin/accounts/'+b.dataset.del);
+      toast(r2.d.code===0?'已删除':(r2.d.message||'失败'), r2.d.code===0?'ok':'err');
+      if(r2.d.code===0) renderAccounts();
+    });
+    bindPager('accountFilters', renderAccounts);
+  }
+  function maskIdCard(id){
+    if (!id || id.length < 8) return id;
+    return id.slice(0,4) + '********' + id.slice(-4);
+  }
+  async function openAccountModal(id){
+    let a = { username:'', name:'', nickname:'', gender:'other', departmentId:1, role:'design', active:true, phone:'', address:'', idCard:'' };
+    const rd = await api('GET','/api/v1/admin/departments');
+    const depts = (rd.d && rd.d.data) || [];
+    if(id){ const r = await api('GET','/api/v1/admin/accounts'); a = r.d.data.find(x=>x.id===id) || a; }
+    const isEdit = !!id;
+    const html = `
+      <div class="space-y-4 text-sm">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">账号名<input id="a_user" class="input mt-1 w-full" value="${esc(a.username||'')}" ${isEdit?'disabled':''} placeholder="登录用账号名"></label>
+          <label class="block">姓名<input id="a_name" class="input mt-1 w-full" value="${esc(a.name||'')}" placeholder="显示姓名"></label>
+          <label class="block">昵称<input id="a_nick" class="input mt-1 w-full" value="${esc(a.nickname||'')}" placeholder="内部昵称"></label>
+          <label class="block">性别<select id="a_gender" class="sel mt-1 w-full">${opt([['male','男'],['female','女'],['other','其他']], a.gender||'other')}</select></label>
+          <label class="block">部门<select id="a_dept" class="sel mt-1 w-full">${opt(depts.map(d=>[String(d.id), d.name]), String(a.departmentId||''))}</select></label>
+          <label class="block">角色<select id="a_role" class="sel mt-1 w-full">${opt([['admin','管理员'],['sales','销售'],['design','设计'],['cs','客服']], a.role)}</select></label>
+          <label class="block">电话号码<input id="a_phone" class="input mt-1 w-full" value="${esc(a.phone||'')}" placeholder="手机号"></label>
+          <label class="block">身份证号<input id="a_idcard" class="input mt-1 w-full" value="${esc(a.idCard||'')}" placeholder="18位身份证号"></label>
+        </div>
+        <label class="block">家庭住址<textarea id="a_addr" class="ta mt-1" rows="2">${esc(a.address||'')}</textarea></label>
+        <label class="block">${isEdit?'重置密码（留空不修改）':'初始密码'}<input id="a_pwd" type="text" class="input mt-1 w-full" placeholder="${isEdit?'留空则不修改':'初始登录密码'}"></label>
+        ${isEdit ? `<label class="block flex items-center gap-2 mt-1"><input id="a_active" type="checkbox" ${a.active?'checked':''}> 账号启用</label>` : ''}
+      </div>`;
+    openModal(isEdit?'编辑用户':'新增用户', html, async () => {
+      const payload = {
+        name:$('#a_name').value, nickname:$('#a_nick').value, gender:$('#a_gender').value,
+        departmentId:$('#a_dept').value, role:$('#a_role').value,
+        phone:$('#a_phone').value, address:$('#a_addr').value, idCard:$('#a_idcard').value
+      };
+      if(!isEdit) payload.username = $('#a_user').value;
+      const pwd = $('#a_pwd').value.trim();
+      if(pwd) payload.password = pwd;
+      if(isEdit && $('#a_active')) payload.active = $('#a_active').checked;
+      if(!isEdit && !payload.username){ toast('请填写账号名','err'); return false; }
+      if(!payload.name){ toast('请填写姓名','err'); return false; }
+      const r2 = isEdit ? await api('PATCH','/api/v1/admin/accounts/'+id, payload) : await api('POST','/api/v1/admin/accounts', payload);
+      if(r2.d.code===0){ toast(isEdit?'已更新':'已创建'); renderAccounts(); return true; }
+      toast(r2.d.message||'保存失败','err'); return false;
+    });
+  }
+
+  /* ====================== 部门管理（仅管理员） ====================== */
+  var deptFilters = { page:1, pageSize:10 };
+  async function renderDepartments(){
+    const r = await api('GET','/api/v1/admin/departments?'+new URLSearchParams(deptFilters).toString());
+    if (!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    const list = items;
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex items-center justify-between">
+        <p class="text-sm text-[#9A8C75]">仅管理员可管理部门。当前共 <b>${total}</b> 个部门。</p>
+        <button id="addDept" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增部门</button>
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left"><th class="p-3">排序</th><th class="p-3">部门名称</th><th class="p-3">负责人</th><th class="p-3">说明</th><th class="p-3">操作</th></tr></thead>
+          <tbody>${list.map(d=>`
+            <tr class="border-t border-[#F0E7D6]">
+              <td class="p-3 text-[#9A8C75]">${d.sort!=null?d.sort:'-'}</td>
+              <td class="p-3 font-medium">${esc(d.name)}</td>
+              <td class="p-3">${esc(d.lead||'-')}</td>
+              <td class="p-3 text-xs text-[#9A8C75]">${esc(d.description||'-')}</td>
+              <td class="p-3 whitespace-nowrap">
+                <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${d.id}">编辑</button>
+                <button class="text-[#C0392B] hover:underline" data-del="${d.id}">删除</button>
+              </td>
+            </tr>`).join('') || '<tr><td colspan="5" class="p-6 text-center text-[#9A8C75]">暂无部门</td></tr>'}</tbody>
+        </table>
+        ${pager(total, page, pageSize, 'deptFilters')}
+      </div>`;
+    $('#addDept').onclick = () => openDeptModal(null);
+    $$('[data-edit]').forEach(b => b.onclick = () => openDeptModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('确定删除该部门？')) return;
+      const r2 = await api('DELETE','/api/v1/admin/departments/'+b.dataset.del);
+      toast(r2.d.code===0?'已删除':(r2.d.message||'失败'), r2.d.code===0?'ok':'err');
+      if (r2.d.code===0) renderDepartments();
+    });
+    bindPager('deptFilters', renderDepartments);
+  }
+  async function openDeptModal(id){
+    let d = { name:'', description:'', lead:'', sort:'' };
+    if (id) { const r = await api('GET','/api/v1/admin/departments'); d = r.d.data.find(x=>x.id===id) || d; }
+    const isEdit = !!id;
+    const html = `
+      <div class="space-y-4 text-sm">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">部门名称 *<input id="dp_name" class="input mt-1 w-full" value="${esc(d.name||'')}" placeholder="如 设计部"></label>
+          <label class="block">负责人<input id="dp_lead" class="input mt-1 w-full" value="${esc(d.lead||'')}" placeholder="部门负责人"></label>
+        </div>
+        <label class="block">排序<input id="dp_sort" type="number" class="input mt-1 w-full" value="${d.sort!=null?d.sort:''}" placeholder="数字越小越靠前"></label>
+        <label class="block">部门说明<textarea id="dp_desc" class="ta mt-1" rows="3">${esc(d.description||'')}</textarea></label>
+      </div>`;
+    openModal(isEdit?'编辑部门':'新增部门', html, async () => {
+      const payload = { name:$('#dp_name').value.trim(), lead:$('#dp_lead').value.trim(), description:$('#dp_desc').value.trim() };
+      const s = $('#dp_sort').value.trim();
+      payload.sort = s ? (+s) : undefined;
+      if (!payload.name) { toast('请填写部门名称','err'); return false; }
+      const r2 = isEdit ? await api('PUT','/api/v1/admin/departments/'+id, payload) : await api('POST','/api/v1/admin/departments', payload);
+      if (r2.d.code===0) { toast(isEdit?'已更新':'已创建'); renderDepartments(); return true; }
+      toast(r2.d.message||'保存失败','err'); return false;
+    });
+  }
+
+  /* ====================== 登录日志（仅管理员） ====================== */
+  var logFilters = { userId:'all', q:'', page:1 };
+  async function renderLoginLogs(){
+    const [r, ra] = await Promise.all([api('GET','/api/v1/admin/login-logs?'+new URLSearchParams(logFilters).toString()), api('GET','/api/v1/admin/accounts')]);
+    if(!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    const users = (ra.d && ra.d.data) || [];
+    const userMap = Object.fromEntries(users.map(u=>[u.id, u]));
+    const stats = {};
+    items.forEach(x => { stats[x.userId] = (stats[x.userId] || 0) + 1; });
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="lFUser" class="sel w-auto">${opt([['all','全部用户']].concat(users.map(u=>[String(u.id), u.username + ' · ' + u.name])), logFilters.userId)}</select>
+        <input id="lFQ" class="input w-56" placeholder="搜索账号/姓名" value="${esc(logFilters.q)}">
+        <button id="lFSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+        <button id="exportLogs" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">导出日志</button>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        ${users.map(u=>`<div class="card p-4 flex items-center justify-between">
+          <span class="text-sm text-[#9A8C75]">${esc(u.username)}</span>
+          <span class="font-serif text-xl font-bold">${stats[u.id]||0}<span class="text-xs font-normal text-[#9A8C75] ml-1">次</span></span>
+        </div>`).join('')}
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left"><th class="p-3">用户</th><th class="p-3">姓名</th><th class="p-3">登录时间</th><th class="p-3">IP</th><th class="p-3">终端</th></tr></thead>
+          <tbody>${items.map(x=>`
+            <tr class="border-t border-[#F0E7D6]">
+              <td class="p-3 font-medium">${esc(x.username)}</td>
+              <td class="p-3">${esc(x.name||'-')}</td>
+              <td class="p-3">${fmtTime(x.loginTime)}</td>
+              <td class="p-3 text-xs text-[#9A8C75]">${esc(x.ip||'-')}</td>
+              <td class="p-3 text-xs text-[#9A8C75] truncate max-w-xs" title="${esc(x.userAgent||'')}">${esc((x.userAgent||'').slice(0,40)||'-')}</td>
+            </tr>`).join('') || '<tr><td colspan="5" class="p-6 text-center text-[#9A8C75]">暂无登录记录</td></tr>'}</tbody>
+        </table>
+      </div>
+      ${pager(total, page, pageSize, 'logFilters')}`;
+    $('#lFSearch').onclick = () => { logFilters.userId=$('#lFUser').value; logFilters.q=$('#lFQ').value; logFilters.page=1; renderLoginLogs(); };
+    $('#exportLogs').onclick = () => {
+      const rows = [['账号','姓名','登录时间','IP','终端']].concat(items.map(x=>[x.username, x.name||'', x.loginTime, x.ip||'', x.userAgent||'']));
+      const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='login-logs.csv'; a.click();
+    };
+    bindPager('logFilters', renderLoginLogs);
+  }
+
+  /* ====================== 留言线索 ====================== */
+  var msgFilters = { status:'all', source:'all', q:'', page:1 };
+  async function renderMessages(){
+    const q = new URLSearchParams(msgFilters).toString() + '&kind=' + (currentMsgKind || 'all');
+    const r = await api('GET','/api/v1/admin/messages?'+q);
+    if(!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    const kindName = currentMsgKind==='message' ? '留言处理' : '预约处理';
+    $('#pageContainer').innerHTML = `
+      <p class="text-sm text-[#9A8C75] mb-3">📁 当前模块：<b>${kindName}</b> · 仅显示「${kindName}」类型的客户记录</p>
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="mFStatus" class="sel w-auto">${opt([['all','全部状态'],['new','未跟进'],['contacted','已联系'],['converted','已成交'],['closed','已关闭']], msgFilters.status)}</select>
+        <select id="mFSource" class="sel w-auto">${opt([['all','全部来源'],['/cases','来自案例页'],['/packages','来自套餐页'],['/about/contact','来自联系页']], msgFilters.source)}</select>
+        <input id="mFQ" class="input w-56" placeholder="搜索姓名/手机号" value="${msgFilters.q}">
+        <button id="mFSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+      </div>
+      <div class="space-y-3">
+        ${items.map(msgCard).join('') || '<div class="card p-6 text-center text-[#9A8C75]">暂无留言</div>'}
+      </div>
+      ${pager(total, page, pageSize, 'msgFilters')}`;
+    bindMsgEvents();
+  }
+  function msgCard(m){
+    return `<div class="card p-5">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2"><b class="text-lg">${esc(m.name)}</b>${statusBadge(m.status)}<span class="text-xs text-[#9A8C75]">来源 ${esc(m.source_page||'-')}</span></div>
+          <p class="text-sm text-[#9A8C75] mt-1">📞 ${esc(m.phone||'-')}  ${m.email?'· ✉️ '+esc(m.email):''}  ${m.budget?'· 💰 '+esc(m.budget):''}</p>
+          <p class="mt-2">${esc(m.content)}</p>
+          <p class="text-xs text-[#9A8C75] mt-2">提交时间：${fmtTime(m.created_at)}</p>
+        </div>
+        <button class="text-[#2F6DB5] hover:underline text-sm shrink-0" data-view="${m.id}">跟进</button>
+      </div></div>`;
+  }
+  function bindMsgEvents(){
+    $('#mFSearch').onclick=()=>{ msgFilters.status=$('#mFStatus').value; msgFilters.source=$('#mFSource').value; msgFilters.q=$('#mFQ').value; msgFilters.page=1; renderMessages(); };
+    $$('[data-view]').forEach(b=>b.onclick=()=>openMsgModal(parseInt(b.dataset.view)));
+    bindPager('msgFilters', renderMessages);
+  }
+  async function openMsgModal(id){
+    const r = await api('GET','/api/v1/admin/messages?pageSize=999');
+    const m = (r.d.data.items || r.d.data).find(x=>x.id===id); if(!m) return;
+    const threads = m.threads || [];
+    const threadHtml = threads.length ? threads.map(t=>`
+      <div class="flex gap-3">
+        <div class="shrink-0 w-16 text-xs text-[#9A8C75]">${fmtTime(t.created_at).split(' ')[0]}</div>
+        <div class="flex-1 p-3 bg-[#F9F3E6] rounded-xl">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="badge ${t.type==='phone'?'badge-blue':t.type==='wechat'?'badge-green':'badge-amber'}">${{phone:'电话',wechat:'微信',sms:'短信',email:'邮件',note:'备注'}[t.type]||t.type}</span>
+            <span class="text-xs text-[#9A8C75]">${esc(t.author)}</span>
+          </div>
+          <p>${esc(t.content)}</p>
+        </div>
+      </div>`).join('') : '<p class="text-sm text-[#9A8C75]">暂无沟通记录</p>';
+    const html = `
+      <div class="space-y-4 text-sm">
+        <div class="grid grid-cols-2 gap-3">
+          <div><span class="text-[#9A8C75]">姓名</span><p class="font-medium">${esc(m.name)}</p></div>
+          <div><span class="text-[#9A8C75]">手机号</span><p class="font-medium">${esc(m.phone||'-')}</p></div>
+          <div><span class="text-[#9A8C75]">邮箱</span><p>${esc(m.email||'-')}</p></div>
+          <div><span class="text-[#9A8C75]">预算</span><p>${esc(m.budget||'-')}</p></div>
+        </div>
+        <div><span class="text-[#9A8C75]">来源页</span><p>${esc(m.source_page||'-')} · ${fmtTime(m.created_at)}</p></div>
+        <div><span class="text-[#9A8C75]">需求</span><p class="mt-1 p-3 bg-[#F9F3E6] rounded-xl">${esc(m.content)}</p></div>
+        <label class="block">状态流转<select id="mm_status" class="sel mt-1">${opt([['new','未跟进'],['contacted','已联系'],['converted','已成交'],['closed','已关闭']],m.status)}</select></label>
+        <label class="block">跟进备注<textarea id="mm_note" class="ta mt-1" rows="2">${esc(m.note||'')}</textarea></label>
+        <div>
+          <p class="text-sm font-medium mb-2">沟通记录（${threads.length}）</p>
+          <div id="mm_threads" class="space-y-2 max-h-40 overflow-y-auto pr-1">${threadHtml}</div>
+        </div>
+        <div class="border-t border-[#ECE3D2] pt-4">
+          <p class="text-sm font-medium mb-2">新增沟通</p>
+          <div class="grid grid-cols-4 gap-3 mb-2">
+            <select id="mm_rtype" class="sel col-span-1">${opt([['phone','电话'],['wechat','微信'],['sms','短信'],['email','邮件'],['note','备注']],'phone')}</select>
+            <input id="mm_rcontent" class="input col-span-3" placeholder="记录本次沟通内容…">
+          </div>
+        </div>
+      </div>`;
+    openModal('跟进留言 · '+m.name, html, async () => {
+      const payload = { status:$('#mm_status').value, note:$('#mm_note').value };
+      const rcontent = $('#mm_rcontent').value.trim();
+      if (rcontent) payload.reply = { type:$('#mm_rtype').value, content:rcontent };
+      const r2 = await api('PATCH','/api/v1/admin/messages/'+id, payload);
+      if(r2.d.code===0){ toast('已保存'); renderMessages(); return true; }
+      toast(r2.d.message||'保存失败','err'); return false;
+    });
+  }
+
+  /* ====================== 通用：模态框 / 分页 / 工具 ====================== */
+  /* ====================== 项目管理 ====================== */
+  var projectFilters = { status:'all', designerId:'all', q:'', page:1 };
+  function projStatusBadge(s){
+    const m = PROJECT_STATUS[s] || { label:s, color:'#9A8C75' };
+    return `<span class="badge" style="background:${m.color}22;color:${m.color}">${m.label}</span>`;
+  }
+  async function renderProjects(){
+    const q = new URLSearchParams(projectFilters).toString();
+    const r = await api('GET','/api/v1/admin/projects?'+q);
+    if (!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="fPStatus" class="sel w-auto">${opt([['all','全部状态'],['lead','线索/预约'],['measuring','量房中'],['designing','方案设计'],['quoting','报价中'],['signed','已签约'],['constructing','施工中'],['acceptance','验收中'],['done','已结案'],['cancelled','已流失']], projectFilters.status)}</select>
+        <select id="fPDesigner" class="sel w-auto"><option value="all">全部设计师</option></select>
+        <input id="fPQ" class="input w-56" placeholder="搜索编号/标题/客户" value="${projectFilters.q}">
+        <button id="fPSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+        ${canWrite('projects') ? '<button id="addProject" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增项目</button>' : ''}
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left">
+            <th class="p-3">编号</th><th class="p-3">标题</th><th class="p-3">客户</th><th class="p-3">设计师</th>
+            <th class="p-3">状态</th><th class="p-3">面积</th><th class="p-3">预算</th><th class="p-3">进度</th><th class="p-3">操作</th>
+          </tr></thead>
+          <tbody>${items.map(rowProject).join('') || '<tr><td colspan="9" class="p-6 text-center text-[#9A8C75]">暂无项目</td></tr>'}</tbody>
+        </table>
+      </div>
+      ${pager(total, page, pageSize, 'projectFilters')}`;
+    // 填充设计师下拉
+    const sr = await api('GET','/api/v1/admin/staff-short');
+    if (sr.ok) $('#fPDesigner').insertAdjacentHTML('beforeend', sr.d.data.map(s => `<option value="${s.id}" ${String(s.id)===String(projectFilters.designerId)?'selected':''}>${esc(s.name)}</option>`).join(''));
+    bindProjectEvents();
+  }
+  function rowProject(p){
+    return `<tr class="border-t border-[#F0E7D6]">
+      <td class="p-3 text-xs text-[#9A8C75]">${esc(p.code)}</td>
+      <td class="p-3 font-medium">${esc(p.title)}</td>
+      <td class="p-3">${esc(p.clientName||'-')}<br><span class="text-xs text-[#9A8C75]">${esc(p.clientPhone||'')}</span></td>
+      <td class="p-3 text-xs">${esc(p.designerName||'未分配')}</td>
+      <td class="p-3">${projStatusBadge(p.status)}</td>
+      <td class="p-3">${p.area||'-'}㎡</td>
+      <td class="p-3 text-xs">${p.budget?('¥'+p.budget):'-'}</td>
+      <td class="p-3">
+        <div class="w-20 h-2 rounded-full bg-[#EFEAE0] overflow-hidden"><div class="h-full bg-[#3C8C4E]" style="width:${p.progress||0}%"></div></div>
+        <span class="text-xs text-[#9A8C75]">${p.progress||0}%</span>
+      </td>
+      <td class="p-3 whitespace-nowrap">
+        ${canWrite('projects') ? `
+        <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${p.id}">编辑</button>
+        <button class="text-[#C0392B] hover:underline" data-del="${p.id}">删除</button>` : '<span class="text-[#9A8C75]">只读</span>'}
+      </td></tr>`;
+  }
+  function bindProjectEvents(){
+    $('#fPSearch').onclick = () => { projectFilters.status=$('#fPStatus').value; projectFilters.designerId=$('#fPDesigner').value; projectFilters.q=$('#fPQ').value; projectFilters.page=1; renderProjects(); };
+    $('#addProject').onclick = () => openProjectModal(null);
+    $$('[data-edit]').forEach(b => b.onclick = () => openProjectModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('确定删除该项目？此操作不可恢复。')) return;
+      const r = await api('DELETE','/api/v1/admin/projects/'+b.dataset.del);
+      toast(r.d.code===0?'已删除':(r.d.message||'删除失败'), r.d.code===0?'ok':'err'); if(r.d.code===0) renderProjects();
+    });
+    bindPager('projectFilters', renderProjects);
+  }
+  async function openProjectModal(id){
+    let p = { status:'lead', progress:0 };
+    if (id){ const r = await api('GET','/api/v1/admin/projects?pageSize=999'); p = ((r.d.data.items || r.d.data).find(x=>x.id===id)) || p; }
+    const [sr, stR] = await Promise.all([api('GET','/api/v1/admin/staff-short'), api('GET','/api/v1/admin/sites?pageSize=999')]);
+    const staffOpts = (sr.ok?sr.d.data:[]).map(s => `<option value="${s.id}" ${String(s.id)===String(p.designerId)?'selected':''}>${esc(s.name)}</option>`).join('');
+    const siteOpts = (stR.ok?(stR.d.data.items || stR.d.data):[]).map(s => `<option value="${s.id}" ${String(s.id)===String(p.siteId)?'selected':''}>${esc(s.name)}</option>`).join('');
+    const html = `
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">项目编号<input id="m_code" class="input mt-1" value="${esc(p.code||'')}" placeholder="留空自动生成"></label>
+          <label class="block">状态<select id="m_status" class="sel mt-1">${Object.keys(PROJECT_STATUS).map(k=>`<option value="${k}" ${k===(p.status||'lead')?'selected':''}>${PROJECT_STATUS[k].label}</option>`).join('')}</select></label>
+          <label class="block">标题 *<input id="m_title" class="input mt-1" value="${esc(p.title||'')}"></label>
+          <label class="block">设计师<select id="m_designer" class="sel mt-1"><option value="">未分配</option>${staffOpts}</select></label>
+          <label class="block">客户姓名<input id="m_cname" class="input mt-1" value="${esc(p.clientName||'')}"></label>
+          <label class="block">客户电话<input id="m_cphone" class="input mt-1" value="${esc(p.clientPhone||'')}"></label>
+          <label class="block">面积(㎡)<input id="m_area" type="number" class="input mt-1" value="${p.area||''}"></label>
+          <label class="block">预算(元)<input id="m_budget" type="number" class="input mt-1" value="${p.budget||''}"></label>
+          <label class="block">风格<input id="m_style" class="input mt-1" value="${esc(p.style||'')}" placeholder="如 北欧 / 现代"></label>
+          <label class="block">进度(%)<input id="m_prog" type="number" class="input mt-1" value="${p.progress||0}" min="0" max="100"></label>
+          <label class="block">关联工地<select id="m_site" class="sel mt-1"><option value="">无</option>${siteOpts}</select></label>
+          <label class="block">开始日期<input id="m_start" type="date" class="input mt-1" value="${esc((p.startDate||'').slice(0,10))}"></label>
+          <label class="block">预计结束<input id="m_end" type="date" class="input mt-1" value="${esc((p.expectedEndDate||'').slice(0,10))}"></label>
+        </div>
+        <label class="block">地址<input id="m_addr" class="input mt-1" value="${esc(p.address||'')}"></label>
+        <label class="block">备注<textarea id="m_note" class="ta mt-1" rows="2">${esc(p.note||'')}</textarea></label>
+      </div>`;
+    openModal(id?'编辑项目':'新增项目', html, async () => {
+      if (!$('#m_title').value.trim()) { toast('请填写标题','err'); return false; }
+      const payload = {
+        code: $('#m_code').value.trim(), title: $('#m_title').value.trim(),
+        status: $('#m_status').value, designerId: $('#m_designer').value ? parseInt($('#m_designer').value) : null,
+        clientName: $('#m_cname').value.trim(), clientPhone: $('#m_cphone').value.trim(),
+        area: +$('#m_area').value||0, budget: +$('#m_budget').value||0, style: $('#m_style').value.trim(),
+        progress: Math.max(0, Math.min(100, +$('#m_prog').value||0)),
+        siteId: $('#m_site').value ? parseInt($('#m_site').value) : null,
+        address: $('#m_addr').value.trim(), note: $('#m_note').value.trim(),
+        startDate: $('#m_start').value || '', expectedEndDate: $('#m_end').value || ''
+      };
+      const r = id ? await api('PUT','/api/v1/admin/projects/'+id, payload) : await api('POST','/api/v1/admin/projects', payload);
+      if (r.d.code===0) { toast(id?'已更新':'已创建'); renderProjects(); return true; }
+      toast(r.d.message||'保存失败','err'); return false;
+    });
+  }
+
+  /* ====================== 团队管理 ====================== */
+  var teamFilters = { page:1, pageSize:10 };
+  async function renderTeam(){
+    const r = await api('GET','/api/v1/admin/team?'+new URLSearchParams(teamFilters).toString());
+    if (!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    const list = items;
+    $('#pageContainer').innerHTML = `
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-sm text-[#9A8C75]">设计 / 服务团队，可同步展示在前台「关于我们 / 团队」。共 <b>${total}</b> 位成员。</p>
+        ${canWrite('team') ? '<button id="addTeam" class="px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增成员</button>' : ''}
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left">
+            <th class="p-3">头像</th><th class="p-3">姓名</th><th class="p-3">职位</th><th class="p-3">专长</th><th class="p-3">简介</th><th class="p-3">排序</th><th class="p-3">操作</th>
+          </tr></thead>
+          <tbody>${list.map(rowTeam).join('') || '<tr><td colspan="7" class="p-6 text-center text-[#9A8C75]">暂无成员</td></tr>'}</tbody>
+        </table>
+        ${pager(total, page, pageSize, 'teamFilters')}
+      </div>`;
+    if ($('#addTeam')) $('#addTeam').onclick = () => openTeamModal(null);
+    $$('[data-edit]').forEach(b => b.onclick = () => openTeamModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('确定删除该成员？')) return;
+      const r = await api('DELETE','/api/v1/admin/team/'+b.dataset.del);
+      toast(r.d.code===0?'已删除':(r.d.message||'删除失败'), r.d.code===0?'ok':'err'); if(r.d.code===0) renderTeam();
+    });
+    bindPager('teamFilters', renderTeam);
+  }
+  function rowTeam(t){
+    return `<tr class="border-t border-[#F0E7D6]">
+      <td class="p-3"><img class="thumb" src="${t.avatar||'https://placehold.co/74'}" alt=""></td>
+      <td class="p-3 font-medium">${esc(t.name)}</td>
+      <td class="p-3">${esc(t.title||'-')}</td>
+      <td class="p-3 text-xs text-[#9A8C75]">${esc(t.specialty||'-')}</td>
+      <td class="p-3 text-xs text-[#9A8C75] max-w-xs truncate">${esc(t.bio||'-')}</td>
+      <td class="p-3">${t.order||'-'}</td>
+      <td class="p-3 whitespace-nowrap">
+        ${canWrite('team') ? `
+        <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${t.id}">编辑</button>
+        <button class="text-[#C0392B] hover:underline" data-del="${t.id}">删除</button>` : '<span class="text-[#9A8C75]">只读</span>'}
+      </td></tr>`;
+  }
+  async function openTeamModal(id){
+    let t = { order: 1, active: true };
+    if (id){ const r = await api('GET','/api/v1/admin/team'); t = (r.d.data.find(x=>x.id===id)) || t; }
+    const html = `
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">姓名 *<input id="t_name" class="input mt-1" value="${esc(t.name||'')}"></label>
+          <label class="block">职位<input id="t_title" class="input mt-1" value="${esc(t.title||'')}" placeholder="如 主案设计师"></label>
+          <label class="block">头像URL<input id="t_avatar" class="input mt-1" value="${esc(t.avatar||'')}" placeholder="https://..."></label>
+          <label class="block">排序<input id="t_order" type="number" class="input mt-1" value="${t.order||1}"></label>
+        </div>
+        <label class="block">擅长风格 / 专长<input id="t_spec" class="input mt-1" value="${esc(t.specialty||'')}" placeholder="如 北欧 / 现代小户型"></label>
+        <label class="block">简介<textarea id="t_bio" class="ta mt-1" rows="3">${esc(t.bio||'')}</textarea></label>
+        <label class="flex items-center gap-2 text-sm"><input id="t_active" type="checkbox" ${t.active!==false?'checked':''}> 在前台展示（启用）</label>
+      </div>`;
+    openModal(id?'编辑成员':'新增成员', html, async () => {
+      if (!$('#t_name').value.trim()) { toast('请填写姓名','err'); return false; }
+      const payload = { name:$('#t_name').value.trim(), title:$('#t_title').value.trim(), avatar:$('#t_avatar').value.trim(), order:+$('#t_order').value||1, specialty:$('#t_spec').value.trim(), bio:$('#t_bio').value.trim(), active:$('#t_active').checked };
+      const r = id ? await api('PUT','/api/v1/admin/team/'+id, payload) : await api('POST','/api/v1/admin/team', payload);
+      if (r.d.code===0) { toast(id?'已更新':'已创建'); renderTeam(); return true; }
+      toast(r.d.message||'保存失败','err'); return false;
+    });
+  }
+
+  /* ====================== 工地联系管理 ====================== */
+  var siteFilters = { q:'', projectId:'all', page:1 };
+  async function renderSites(){
+    const q = new URLSearchParams(siteFilters).toString();
+    const r = await api('GET','/api/v1/admin/sites?'+q);
+    if (!r.ok) return;
+    const { items, total, page, pageSize } = r.d.data;
+    $('#pageContainer').innerHTML = `
+      <div class="card p-5 mb-4 flex flex-wrap items-center gap-3">
+        <select id="fSProject" class="sel w-auto"><option value="all">全部关联项目</option></select>
+        <input id="fSQ" class="input w-56" placeholder="搜索工地/负责人/电话" value="${siteFilters.q}">
+        <button id="fSSearch" class="btn-yolk px-4 py-2 rounded-xl text-sm cursor-pointer">筛选</button>
+        ${canWrite('sites') ? '<button id="addSite" class="ml-auto px-4 py-2 rounded-xl bg-[#4A3F30] text-white text-sm cursor-pointer hover:bg-[#3a3226]">+ 新增工地</button>' : ''}
+      </div>
+      <div class="card overflow-hidden">
+        <table class="w-full text-sm">
+          <thead><tr class="th text-left">
+            <th class="p-3">工地名称</th><th class="p-3">地址</th><th class="p-3">现场负责人</th><th class="p-3">电话</th><th class="p-3">关联项目</th><th class="p-3">备注</th><th class="p-3">操作</th>
+          </tr></thead>
+          <tbody>${items.map(rowSite).join('') || '<tr><td colspan="7" class="p-6 text-center text-[#9A8C75]">暂无工地联系</td></tr>'}</tbody>
+        </table>
+      </div>
+      ${pager(total, page, pageSize, 'siteFilters')}`;
+    const pr = await api('GET','/api/v1/admin/projects?pageSize=999');
+    if (pr.ok) $('#fSProject').insertAdjacentHTML('beforeend', (pr.d.data.items || pr.d.data).map(p => `<option value="${p.id}" ${String(p.id)===String(siteFilters.projectId)?'selected':''}>${esc(p.code)} · ${esc(p.title)}</option>`).join(''));
+    bindSiteEvents();
+  }
+  function rowSite(s){
+    return `<tr class="border-t border-[#F0E7D6]">
+      <td class="p-3 font-medium">${esc(s.name)}</td>
+      <td class="p-3 text-xs text-[#9A8C75] max-w-xs truncate">${esc(s.address||'-')}</td>
+      <td class="p-3">${esc(s.supervisor||'-')}</td>
+      <td class="p-3 text-xs">${esc(s.phone||'-')}</td>
+      <td class="p-3 text-xs">${s.projectId?('#'+s.projectId):'-'}</td>
+      <td class="p-3 text-xs text-[#9A8C75] max-w-xs truncate">${esc(s.remark||'-')}</td>
+      <td class="p-3 whitespace-nowrap">
+        ${canWrite('sites') ? `
+        <button class="text-[#2F6DB5] hover:underline mr-2" data-edit="${s.id}">编辑</button>
+        <button class="text-[#C0392B] hover:underline" data-del="${s.id}">删除</button>` : '<span class="text-[#9A8C75]">只读</span>'}
+      </td></tr>`;
+  }
+  function bindSiteEvents(){
+    $('#fSSearch').onclick = () => { siteFilters.q=$('#fSQ').value; siteFilters.projectId=$('#fSProject').value; siteFilters.page=1; renderSites(); };
+    $('#addSite').onclick = () => openSiteModal(null);
+    $$('[data-edit]').forEach(b => b.onclick = () => openSiteModal(parseInt(b.dataset.edit)));
+    $$('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('确定删除该工地联系？')) return;
+      const r = await api('DELETE','/api/v1/admin/sites/'+b.dataset.del);
+      toast(r.d.code===0?'已删除':(r.d.message||'删除失败'), r.d.code===0?'ok':'err'); if(r.d.code===0) renderSites();
+    });
+    bindPager('siteFilters', renderSites);
+  }
+  async function openSiteModal(id){
+    let s = {};
+    if (id){ const r = await api('GET','/api/v1/admin/sites?pageSize=999'); s = ((r.d.data.items || r.d.data).find(x=>x.id===id)) || s; }
+    const pr = await api('GET','/api/v1/admin/projects?pageSize=999');
+    const projOpts = (pr.ok?(pr.d.data.items || pr.d.data):[]).map(p => `<option value="${p.id}" ${String(p.id)===String(s.projectId)?'selected':''}>${esc(p.code)} · ${esc(p.title)}</option>`).join('');
+    const html = `
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <label class="block">工地名称 *<input id="s_name" class="input mt-1" value="${esc(s.name||'')}"></label>
+          <label class="block">现场负责人<input id="s_sup" class="input mt-1" value="${esc(s.supervisor||'')}"></label>
+          <label class="block">电话<input id="s_phone" class="input mt-1" value="${esc(s.phone||'')}"></label>
+          <label class="block">关联项目<select id="s_proj" class="sel mt-1"><option value="">无</option>${projOpts}</select></label>
+        </div>
+        <label class="block">地址<input id="s_addr" class="input mt-1" value="${esc(s.address||'')}"></label>
+        <label class="block">备注<textarea id="s_remark" class="ta mt-1" rows="2">${esc(s.remark||'')}</textarea></label>
+      </div>`;
+    openModal(id?'编辑工地联系':'新增工地联系', html, async () => {
+      if (!$('#s_name').value.trim()) { toast('请填写工地名称','err'); return false; }
+      const payload = { name:$('#s_name').value.trim(), supervisor:$('#s_sup').value.trim(), phone:$('#s_phone').value.trim(), projectId:$('#s_proj').value?parseInt($('#s_proj').value):null, address:$('#s_addr').value.trim(), remark:$('#s_remark').value.trim() };
+      const r = id ? await api('PUT','/api/v1/admin/sites/'+id, payload) : await api('POST','/api/v1/admin/sites', payload);
+      if (r.d.code===0) { toast(id?'已更新':'已创建'); renderSites(); return true; }
+      toast(r.d.message||'保存失败','err'); return false;
+    });
+  }
+
+  function openModal(title, bodyHtml, onSave){
+    const root = $('#modalRoot');
+    root.innerHTML = `<div class="modal-mask fixed inset-0 z-40 flex items-start justify-center p-4 overflow-y-auto" style="background:rgba(74,63,48,.45);">
+      <div class="card w-full max-w-2xl my-10 p-6">
+        <div class="flex items-center justify-between mb-4"><h3 class="font-serif text-xl font-bold">${title}</h3><button id="mClose" class="text-2xl text-[#9A8C75] cursor-pointer">×</button></div>
+        <div id="mBody" class="max-h-[60vh] overflow-y-auto pr-1">${bodyHtml}</div>
+        <div class="flex justify-end gap-3 mt-5">
+          <button id="mCancel" class="px-4 py-2 rounded-xl border border-[#ECE3D2] text-sm cursor-pointer">取消</button>
+          <button id="mSave" class="btn-yolk px-5 py-2 rounded-xl text-sm font-medium cursor-pointer">保存</button>
+        </div>
+      </div></div>`;
+    const close = () => root.innerHTML='';
+    $('#mClose').onclick = close; $('#mCancel').onclick = close;
+    root.querySelector('.modal-mask').onclick = (e)=>{ if(e.target===root.querySelector('.modal-mask')) close(); };
+    $('#mSave').onclick = async () => { const ok = await onSave(); if(ok) close(); };
+  }
+  function pager(total, page, pageSize, stateVar){
+    if (!total) return ''; // 空数据不显示分页条
+    const pages = Math.max(1, Math.ceil(total/pageSize)||1); // 1 页也显示分页条（与设计稿一致）
+    const prevDis = page <= 1, nextDis = page >= pages;
+    const navBtn = (cls) => `px-4 py-2.5 rounded-xl border text-sm ${cls}`;
+    const navDis = 'border-[#F0E7D6] text-[#C5B89E] cursor-not-allowed';
+    const navOn  = 'border-[#ECE3D2] text-[#4A3F30] hover:bg-[#F9F3E6] cursor-pointer';
+    const numOn  = 'border border-[#ECE3D2] text-[#4A3F30] hover:bg-[#F9F3E6] cursor-pointer';
+    const numCur = 'btn-yolk text-[#4A3F30] font-medium';
+    let btns = [];
+    btns.push(`<button class="${navBtn(prevDis?navDis:navOn)}" ${prevDis?'disabled':''} data-pg="${page-1}">上一页</button>`);
+    for(let i=1;i<=pages;i++) btns.push(`<button class="${navBtn(i===page?numCur:numOn)}" data-pg="${i}">${i}</button>`);
+    btns.push(`<button class="${navBtn(nextDis?navDis:navOn)}" ${nextDis?'disabled':''} data-pg="${page+1}">下一页</button>`);
+    return `<div class="flex flex-wrap justify-center items-center gap-2.5 mt-6" data-state="${stateVar}">${btns.join('')}<span class="text-xs text-[#9A8C75] ml-1 whitespace-nowrap">共 ${total} 条 · 第 ${page}/${pages} 页</span></div>`;
+  }
+  function bindPager(stateVar, render){
+    $$('.flex.justify-center [data-pg]').forEach(b=>b.onclick=()=>{ const p=+b.dataset.pg; if(p<1) return; window[stateVar].page=p; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+  }
+  function opt(arr, cur){ return arr.map(([v,t])=>`<option value="${v}" ${v===cur?'selected':''}>${t}</option>`).join(''); }
+  function splitCSV(s, sep=','){ return (s||'').split(sep).map(x=>x.trim()).filter(Boolean); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function fmtTime(s){ try { return new Date(s).toLocaleString('zh-CN'); } catch(e){ return s; } }
+  </script>
+</body>
+</html>

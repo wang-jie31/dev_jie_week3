@@ -1,0 +1,35 @@
+# 依赖
+node_modules/
+# 手工备份变体（*.npm_bak / *.ok_del 等）
+node_modules.*/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# 构建产物
+dist/
+.next/
+# 变体（.next_dev_s8 / .next_bak_* / .next_old_* 等）
+.next*/
+build/
+*.tsbuildinfo
+
+# 环境与密钥
+.env
+.env.*
+!.env.example
+
+# 上传文件与数据
+uploads/
+data/
+*.dump
+
+# 编辑器/系统
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log

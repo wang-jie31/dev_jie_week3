@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>栖屿设计 · 个人独居温馨小宅定制</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@500;600;700;900&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream:  '#FFFDF6',
+            sand:   '#FFF3CF',
+            butter: '#FCE9A6',
+            yolk:   '#F7D06A',
+            'yolk-d':'#EDB93F',
+            ink:    '#4A3F30',
+            muted:  '#9A8C75',
+            line:   '#F0E3BE',
+          },
+          fontFamily: {
+            serif: ['"Noto Serif SC"', 'serif'],
+            sans:  ['"Noto Sans SC"', '"Inter"', 'system-ui', 'sans-serif'],
+            en:    ['"Inter"', 'sans-serif'],
+          },
+          maxWidth: { content: '1280px' },
+          boxShadow: { soft: '0 14px 40px -18px rgba(120,95,30,0.25)' },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Noto Sans SC', 'Inter', system-ui, sans-serif; }
+    .font-en { font-family: 'Inter', sans-serif; letter-spacing: .14em; }
+
+    /* 导航下拉 */
+    .nav-dropdown { opacity: 0; visibility: hidden; transform: translateY(8px); transition: opacity .2s ease, transform .2s ease, visibility .2s; }
+    .group:hover > .nav-dropdown,
+    .group:focus-within > .nav-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+    .nav-link { position: relative; }
+    .nav-link::after { content: ''; position: absolute; left: 0; bottom: -4px; height: 2px; width: 0; background: #EDB93F; transition: width .22s ease; }
+    .nav-link:hover::after, .nav-link:focus-visible::after, .nav-link[aria-current="true"]::after { width: 100%; }
+    .nav-link[aria-current="true"] { color: #C8951F; }
+    a:focus-visible, button:focus-visible { outline: 2px solid #EDB93F; outline-offset: 3px; border-radius: 6px; }
+
+    /* 轮播 */
+    .carousel-track { display: flex; transition: transform .6s cubic-bezier(.4,0,.2,1); }
+    .carousel-slide { min-width: 100%; }
+    .dot { width: 9px; height: 9px; border-radius: 9999px; background: rgba(74,63,48,.25); transition: all .25s; }
+    .dot.active { background: #EDB93F; width: 26px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html, .carousel-track { scroll-behavior: auto; transition: none; }
+    }
+    .tab-btn.active { background: #F7D06A; color: #4A3F30; box-shadow: 0 6px 16px -8px rgba(120,95,30,.5); }
+
+    /* 页面路由：每个导航项切换为不同页面，进入时渐入 */
+    .page.is-active { animation: pageIn .45s cubic-bezier(.22,.61,.36,1) both; }
+    @keyframes pageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+    /* 多维筛选 chips */
+    .fchip, .nchip { transition: background .18s ease, color .18s ease, border-color .18s ease; }
+    .fchip.active, .nchip.active { background: #F7D06A; color: #4A3F30; border-color: #EDB93F; }
+    .filter-label { width: 3rem; flex: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .page.is-active { animation: none; }
+      .reveal { opacity:1; transform:none; transition:none; }
+    }
+
+    /* lanniao 风格：页面 Hero 暗色大图 */
+    .page-hero {
+      position: relative; min-height: 320px; max-height: 420px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .page-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .page-hero .overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(39,40,44,.55), rgba(39,40,44,.75)); }
+    .page-hero .content { position: relative; z-index: 10; text-align: center; }
+    .page-hero .eyebrow { font-family: 'Inter', sans-serif; letter-spacing: .18em; font-size: 13px; color: #F7D06A; text-transform: uppercase; margin-bottom: .75rem; }
+    .page-hero h1 { color: #FFFDF6; font-size: 2.5rem; font-weight: 800; }
+    .page-hero .sub { color: rgba(255,253,246,.85); margin-top: .75rem; max-width: 600px; margin-inline: auto; }
+
+    /* 卡片通用 */
+    .card { background: #FFFDF6; border: 1px solid #F0E3BE; border-radius: 1rem; overflow: hidden; transition: box-shadow .25s ease, transform .25s ease; }
+    .card:hover { box-shadow: 0 18px 45px -20px rgba(120,95,30,.28); transform: translateY(-3px); }
+
+    /* 案例图片卡 */
+    .case-image-card { display: flex; flex-direction: column; cursor: pointer; }
+    .case-image-card .thumb { height: 210px; overflow: hidden; position: relative; }
+    .case-image-card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+    .case-image-card:hover .thumb img { transform: scale(1.05); }
+    .case-image-card .meta { padding: 1.25rem; display: flex; flex-direction: column; gap: .5rem; flex: 1; }
+    .case-image-card .tag { align-self: flex-start; font-size: 12px; padding: .25rem .75rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(247,208,106,.30), rgba(252,233,166,.34)); border: 1px solid rgba(237,185,63,.28); color: #8B6C23; }
+    .case-image-card h3 { font-family: 'Noto Serif SC', serif; font-size: 1.15rem; font-weight: 700; margin-top: auto; }
+    .case-image-card .facts { font-size: 13px; color: #9A8C75; }
+
+    /* 首页精选案例 - lanniao 风格图左文右排版（参考 planA 详情页：红色品牌标签 + 红描边描述框） */
+    #homeCases.featured-cases { display: flex; flex-direction: column; gap: 3.5rem; }
+    .featured-case { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3rem; align-items: center; cursor: pointer; }
+    .featured-case.reverse { grid-template-columns: 1fr 1.15fr; }
+    .featured-case.reverse .featured-img { order: 2; }
+    .featured-case .featured-img { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 14px; background: #F0E3BE; box-shadow: 0 18px 40px -22px rgba(120,95,30,.25); }
+    .featured-case .featured-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+    .featured-case:hover .featured-img img { transform: scale(1.04); }
+    .featured-case .cat-tag { position: absolute; top: 16px; left: 16px; background: rgba(255,253,246,.95); color: #8B6C23; font-size: 12px; padding: .35rem .9rem; border-radius: 9999px; font-weight: 500; letter-spacing: .04em; backdrop-filter: blur(6px); }
+    .featured-case .info { padding: .25rem .5rem; }
+    .featured-case .brand-label { color: #C73E3A; font-size: 12px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; font-family: 'Inter', sans-serif; }
+    .featured-case .case-title { font-family: 'Noto Serif SC', serif; font-size: 1.9rem; font-weight: 700; color: #4A3F30; margin: .55rem 0 1.1rem; line-height: 1.3; }
+    .featured-case .desc-box { border: 1px solid #C73E3A; border-radius: 6px; padding: 1.1rem 1.3rem; background: rgba(199,62,58,.025); }
+    .featured-case .desc-box p { color: #4A3F30; font-size: 14px; line-height: 1.85; opacity: .82; }
+    .featured-case .desc-box p + p { margin-top: .7rem; }
+    .featured-case .meta-line { margin-top: 1.2rem; font-size: 13px; color: #9A8C75; display: flex; flex-wrap: wrap; gap: .35rem; }
+    .featured-case .meta-line .dot { color: #C8951F; margin: 0 .15rem; }
+    .featured-case .more-link { margin-top: 1.4rem; display: inline-flex; align-items: center; gap: .4rem; color: #C73E3A; font-size: 14px; font-weight: 500; transition: gap .2s ease; }
+    .featured-case:hover .more-link { gap: .65rem; }
+    .featured-case .more-link::after { content: '→'; transition: transform .2s ease; }
+    .featured-case:hover .more-link::after { transform: translateX(3px); }
+    @media (max-width: 768px) {
+      .featured-case, .featured-case.reverse { grid-template-columns: 1fr; gap: 1.6rem; }
+      .featured-case.reverse .featured-img { order: 0; }
+      .featured-case .case-title { font-size: 1.5rem; }
+    }
+
+    /* 横向信息卡（新闻 / 招聘） */
+    .info-row { display: grid; grid-template-columns: 200px 1fr; min-height: 160px; }
+    @media (max-width: 640px) { .info-row { grid-template-columns: 1fr; min-height: auto; } }
+    .info-row .cover { position: relative; min-height: 160px; }
+    .info-row .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .info-row .body { padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .info-row .label { font-size: 12px; color: #C8951F; font-weight: 500; margin-bottom: .5rem; }
+    .info-row h3 { font-family: 'Noto Serif SC', serif; font-size: 1.25rem; font-weight: 700; }
+    .info-row p { color: #9A8C75; font-size: 14px; line-height: 1.7; margin-top: .5rem; }
+    .info-row .aside { margin-left: auto; text-align: right; color: #9A8C75; font-size: 13px; white-space: nowrap; }
+
+    /* 招聘卡片 */
+    .career-row { display: grid; grid-template-columns: 120px 1fr; align-items: stretch; }
+    @media (max-width: 640px) { .career-row { grid-template-columns: 1fr; } }
+    .career-row .icon-box { background: linear-gradient(135deg, rgba(247,208,106,.38), rgba(252,233,166,.42)); border-right: 1px solid rgba(237,185,63,.20); display: flex; align-items: center; justify-content: center; }
+    .career-row .icon-box svg { width: 44px; height: 44px; color: #4A3F30; }
+
+    /* 联系信息卡 */
+    .contact-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    @media (max-width: 768px) { .contact-info-grid { grid-template-columns: 1fr; } }
+    .contact-info-card { background: #FFFDF6; border: 1px solid #F0E3BE; border-radius: 1rem; padding: 2rem 1.25rem; text-align: center; transition: transform .25s ease, box-shadow .25s ease; }
+    .contact-info-card:hover { transform: translateY(-4px); box-shadow: 0 18px 45px -20px rgba(120,95,30,.28); }
+    .contact-info-card .icon { width: 56px; height: 56px; margin-inline: auto; border-radius: 50%; border: 1.5px solid #F0E3BE; display: flex; align-items: center; justify-content: center; color: #C8951F; }
+    .contact-info-card h4 { font-weight: 700; margin-top: 1rem; }
+    .contact-info-card p { color: #9A8C75; font-size: 14px; margin-top: .35rem; }
+
+    /* 关于我们：单页分区 */
+    .about-section { padding: 4rem 0; }
+    .about-section.alt { background: #FFFDF6; }
+    .about-section h2 { font-family: 'Noto Serif SC', serif; font-size: 1.75rem; font-weight: 800; margin-bottom: 1.25rem; }
+    .about-section .lead { color: #9A8C75; line-height: 1.8; max-width: 720px; }
+    .process-card { background: #FFFDF6; border: 1px solid #F0E3BE; border-radius: 1rem; padding: 1.75rem; text-align: center; }
+    .process-card .num { font-family: 'Inter', sans-serif; font-size: 2.25rem; font-weight: 800; color: #F7D06A; line-height: 1; }
+    .process-card h4 { font-weight: 700; margin-top: .75rem; }
+    .team-card { background: #FFFDF6; border: 1px solid #F0E3BE; border-radius: 1rem; padding: 1.75rem; text-align: center; }
+    .team-card .avatar { width: 88px; height: 88px; margin-inline: auto; border-radius: 50%; background: linear-gradient(135deg, rgba(247,208,106,.38), rgba(252,233,166,.42)); border: 1px solid rgba(237,185,63,.28); display: flex; align-items: center; justify-content: center; font-family: 'Noto Serif SC', serif; font-size: 1.75rem; font-weight: 700; color: #4A3F30; }
+    .history-line { position: relative; padding-left: 2rem; border-left: 2px solid rgba(237,185,63,.45); }
+    .history-line li { position: relative; padding-bottom: 2rem; }
+    .history-line li::before { content: ''; position: absolute; left: -2.35rem; top: .35rem; width: 12px; height: 12px; border-radius: 50%; background: rgba(237,185,63,.55); border: 2px solid #FFFDF6; box-shadow: 0 0 0 2px rgba(237,185,63,.35); }
+
+    /* 滚动渐入 */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* 高德地图容器 */
+    .map-wrap { border: 1px solid #F0E3BE; border-radius: 1rem; overflow: hidden; background: #FFFDF6; min-height: 420px; display: flex; flex-direction: column; }
+    .map-wrap iframe { flex: 1 1 auto; min-height: 0; }
+
+    /* 透明渐变黄色系（更轻盈、更适配浅色背景） */
+    .btn-yolk {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(247,208,106,.42), rgba(252,233,166,.46));
+      border: 1px solid rgba(237,185,63,.35);
+      color: #4A3F30;
+      padding: .75rem 1.5rem;
+      border-radius: 9999px;
+      font-weight: 500;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+    .btn-yolk:hover { background: linear-gradient(135deg, rgba(247,208,106,.58), rgba(252,233,166,.62)); transform: translateY(-1px); box-shadow: 0 10px 28px -10px rgba(237,185,63,.35); }
+    .btn-yolk:active { transform: translateY(0); }
+
+    .icon-yolk {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(247,208,106,.35), rgba(252,233,166,.40));
+      border: 1px solid rgba(237,185,63,.25);
+      color: #4A3F30;
+      backdrop-filter: blur(4px);
+    }
+
+    .badge-yolk {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(247,208,106,.30), rgba(252,233,166,.34));
+      border: 1px solid rgba(237,185,63,.28);
+      color: #8B6C23;
+    }
+
+    .tab-btn.active, .tab-active {
+      background: linear-gradient(135deg, rgba(247,208,106,.42), rgba(252,233,166,.46));
+      border-color: rgba(237,185,63,.35);
+      color: #4A3F30;
+      box-shadow: 0 6px 16px -8px rgba(120,95,30,.22);
+    }
+    .fchip.active, .nchip.active {
+      background: linear-gradient(135deg, rgba(247,208,106,.42), rgba(252,233,166,.46));
+      border-color: rgba(237,185,63,.35);
+      color: #4A3F30;
+    }
+    .page-active {
+      background: linear-gradient(135deg, rgba(247,208,106,.42), rgba(252,233,166,.46));
+      border-color: rgba(237,185,63,.35);
+      color: #4A3F30;
+    }
+  </style>
+</head>
+
+<body class="bg-cream text-ink antialiased">
+
+  <!-- file:// 直开提示：提交已支持，但数据不实时同步后台（fetch 跨域被拦截） -->
+  <div id="fileModeBanner" class="hidden bg-[#4A3F30] text-[#FCE9A6] text-center text-xs sm:text-sm py-2 px-4 leading-relaxed">
+    你正以本地文件方式打开：预约提交已支持，但前台数据不会实时同步后台。推荐用
+    <a class="underline font-medium" href="http://localhost:3001/site/index-v7.html">http://localhost:3001/site/index-v7.html</a>
+    打开，体验完整联调。
+  </div>
+
+  <!-- ======================= 顶部导航（严格遵照 PRD §6.1） ======================= -->
+  <header class="sticky top-0 z-50">
+    <nav aria-label="主导航" class="mx-auto max-w-content mt-3 rounded-2xl bg-cream/90 backdrop-blur-md border border-line shadow-soft">
+      <div class="flex items-center justify-between px-5 sm:px-7 h-[68px]">
+
+        <!-- 首页 (Logo) -->
+        <a href="#home" data-nav="home" aria-label="栖屿设计 首页" class="flex items-center gap-2.5 shrink-0 cursor-pointer">
+          <span class="icon-yolk rounded-xl w-10 h-10">
+            <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <path d="M3 11.5 12 4l9 7.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5.5 10.5V19h13v-8.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 19v-4.5h4V19" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="leading-tight">
+            <span class="block font-serif text-lg font-bold tracking-wide">栖屿设计</span>
+            <span class="block font-en text-[10px] text-muted uppercase">QIYU STUDIO</span>
+          </span>
+        </a>
+
+        <!-- 桌面端菜单 -->
+        <ul class="hidden lg:flex items-center gap-1 text-[15px]">
+          <li>
+            <a href="#home" data-nav="home" class="nav-link flex items-center px-3.5 py-2.5 font-medium cursor-pointer">首页</a>
+          </li>
+          <li class="group relative">
+            <a href="#cases" data-nav="cases" class="nav-link flex items-center gap-1 px-3.5 py-2.5 font-medium cursor-pointer">
+              案例展示
+              <svg viewBox="0 0 20 20" class="w-4 h-4 text-muted" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="nav-dropdown absolute left-0 top-full pt-3 w-52">
+              <div class="bg-cream border border-line rounded-xl shadow-soft py-2">
+                <a href="#cases" data-nav="cases:private"   class="block px-4 py-2.5 hover:bg-sand cursor-pointer">私宅</a>
+                <a href="#cases" data-nav="cases:small"     class="block px-4 py-2.5 hover:bg-sand cursor-pointer">小户型</a>
+                <a href="#cases" data-nav="cases:apartment" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">公寓改造</a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="#packages" data-nav="packages" class="nav-link flex items-center px-3.5 py-2.5 font-medium cursor-pointer">服务套餐</a>
+          </li>
+
+          <li class="group relative">
+            <a href="#news" data-nav="news" class="nav-link flex items-center gap-1 px-3.5 py-2.5 font-medium cursor-pointer">
+              新闻资讯
+              <svg viewBox="0 0 20 20" class="w-4 h-4 text-muted" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="nav-dropdown absolute left-0 top-full pt-3 w-52">
+              <div class="bg-cream border border-line rounded-xl shadow-soft py-2">
+                <a href="#news" data-nav="news:company"  class="block px-4 py-2.5 hover:bg-sand cursor-pointer">企业新闻</a>
+                <a href="#news" data-nav="news:industry" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">行业资讯</a>
+              </div>
+            </div>
+          </li>
+
+          <li class="group relative">
+            <a href="#careers" data-nav="careers" class="nav-link flex items-center gap-1 px-3.5 py-2.5 font-medium cursor-pointer">
+              招聘入口
+              <svg viewBox="0 0 20 20" class="w-4 h-4 text-muted" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="nav-dropdown absolute left-0 top-full pt-3 w-52">
+              <div class="bg-cream border border-line rounded-xl shadow-soft py-2">
+                <a href="#careers" data-nav="careers:social" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">社会招聘</a>
+                <a href="#careers" data-nav="careers:campus" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">校园招聘</a>
+              </div>
+            </div>
+          </li>
+
+          <li class="group relative">
+            <a href="#about" data-nav="about" class="nav-link flex items-center gap-1 px-3.5 py-2.5 font-medium cursor-pointer">
+              关于我们
+              <svg viewBox="0 0 20 20" class="w-4 h-4 text-muted" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div class="nav-dropdown absolute left-0 top-full pt-3 w-60">
+              <div class="bg-cream border border-line rounded-xl shadow-soft py-2">
+                <a href="#about" data-nav="about:brand"    class="block px-4 py-2.5 hover:bg-sand cursor-pointer">品牌介绍</a>
+                <a href="#about" data-nav="about:process"  class="block px-4 py-2.5 hover:bg-sand cursor-pointer">设计流程</a>
+                <a href="#about" data-nav="about:team"     class="block px-4 py-2.5 hover:bg-sand cursor-pointer">设计团队</a>
+                <a href="#about" data-nav="about:history"  class="block px-4 py-2.5 hover:bg-sand cursor-pointer">发展历程</a>
+                <a href="#about" data-nav="about:contact"  class="block px-4 py-2.5 hover:bg-sand cursor-pointer">联系我们</a>
+              </div>
+            </div>
+          </li>
+
+          <li class="ml-2">
+            <a href="#about" data-nav="about:contact" class="btn-yolk px-5 py-2.5 cursor-pointer">预约咨询</a>
+          </li>
+        </ul>
+
+        <!-- 移动端汉堡 -->
+        <button id="menuToggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="mobileMenu" class="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-xl border border-line cursor-pointer">
+          <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 移动端抽屉 -->
+    <div id="mobileMenu" class="lg:hidden hidden mx-3 mt-2 bg-cream border border-line rounded-2xl shadow-soft p-3">
+      <a href="#home" data-nav="home" class="block px-4 py-3 rounded-lg hover:bg-sand font-medium cursor-pointer">首页</a>
+      <div class="mobile-group">
+        <button type="button" class="flex items-center justify-between w-full px-4 py-3 rounded-lg hover:bg-sand font-medium cursor-pointer" data-mobile-toggle>
+          案例展示 <svg viewBox="0 0 20 20" class="w-4 h-4 text-muted transition-transform" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="hidden pl-4 border-l border-line ml-4 mt-1">
+          <a href="#cases" data-nav="cases:private"   class="block px-4 py-2.5 hover:bg-sand cursor-pointer">私宅</a>
+          <a href="#cases" data-nav="cases:small"     class="block px-4 py-2.5 hover:bg-sand cursor-pointer">小户型</a>
+          <a href="#cases" data-nav="cases:apartment" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">公寓改造</a>
+        </div>
+      </div>
+      <a href="#packages" data-nav="packages" class="block px-4 py-3 rounded-lg hover:bg-sand font-medium cursor-pointer">服务套餐</a>
+      <div class="mobile-group">
+        <button type="button" class="flex items-center justify-between w-full px-4 py-3 rounded-lg hover:bg-sand font-medium cursor-pointer" data-mobile-toggle>
+          新闻资讯 <svg viewBox="0 0 20 20" class="w-4 h-4 text-muted transition-transform" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="hidden pl-4 border-l border-line ml-4 mt-1">
+          <a href="#news" data-nav="news:company"  class="block px-4 py-2.5 hover:bg-sand cursor-pointer">企业新闻</a>
+          <a href="#news" data-nav="news:industry" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">行业资讯</a>
+        </div>
+      </div>
+      <div class="mobile-group">
+        <button type="button" class="flex items-center justify-between w-full px-4 py-3 rounded-lg hover:bg-sand font-medium cursor-pointer" data-mobile-toggle>
+          招聘入口 <svg viewBox="0 0 20 20" class="w-4 h-4 text-muted transition-transform" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="hidden pl-4 border-l border-line ml-4 mt-1">
+          <a href="#careers" data-nav="careers:social" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">社会招聘</a>
+          <a href="#careers" data-nav="careers:campus" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">校园招聘</a>
+        </div>
+      </div>
+      <div class="mobile-group">
+        <button type="button" class="flex items-center justify-between w-full px-4 py-3 rounded-lg hover:bg-sand font-medium cursor-pointer" data-mobile-toggle>
+          关于我们 <svg viewBox="0 0 20 20" class="w-4 h-4 text-muted transition-transform" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="hidden pl-4 border-l border-line ml-4 mt-1">
+          <a href="#about" data-nav="about:brand"   class="block px-4 py-2.5 hover:bg-sand cursor-pointer">品牌介绍</a>
+          <a href="#about" data-nav="about:process" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">设计流程</a>
+          <a href="#about" data-nav="about:team"    class="block px-4 py-2.5 hover:bg-sand cursor-pointer">设计团队</a>
+          <a href="#about" data-nav="about:history" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">发展历程</a>
+          <a href="#about" data-nav="about:contact" class="block px-4 py-2.5 hover:bg-sand cursor-pointer">联系我们</a>
+        </div>
+      </div>
+      <a href="#about" data-nav="about:contact" class="btn-yolk block mt-2 text-center px-4 py-3 cursor-pointer">预约咨询</a>
+    </div>
+  </header>
+
+  <main id="app">
+
+    <!-- ======================= 首页 ======================= -->
+    <section class="page is-active" data-page="home">
+      <!-- Hero 全屏轮播（参考截图：全幅室内背景 + 居中文案 + 底栏） -->
+      <div class="relative h-[85vh] min-h-[560px] max-h-[900px] overflow-hidden bg-ink">
+        <div class="carousel-track absolute inset-0 h-full" id="heroTrack">
+          <div class="carousel-slide relative h-full w-full">
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1920&q=80" alt="栖屿设计温馨客厅实景" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-r from-ink/75 via-ink/40 to-ink/10"></div>
+            <div class="relative h-full flex flex-col justify-center px-6 sm:px-12 lg:px-20 max-w-content mx-auto pt-28">
+              <p class="font-en text-cream/80 text-sm uppercase tracking-widest mb-4">Cozy Home Design</p>
+              <h1 class="font-serif text-4xl sm:text-6xl font-black text-cream leading-tight">把小户型住成温馨的家</h1>
+              <p class="mt-5 text-lg sm:text-xl text-cream/90 max-w-xl leading-relaxed">专注独居小家设计，用收纳、采光与材质打造舒适日常。</p>
+              <div class="mt-8 flex flex-wrap gap-3">
+                <button data-nav="cases" class="btn-yolk px-7 py-3 cursor-pointer">浏览案例</button>
+                <button data-nav="packages" class="inline-flex items-center justify-center px-7 py-3 rounded-full border border-cream/60 text-cream hover:bg-cream/10 transition-colors duration-200 cursor-pointer">了解服务</button>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-slide relative h-full w-full">
+            <img src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?auto=format&fit=crop&w=1920&q=80" alt="栖屿设计卧室实景" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-r from-ink/75 via-ink/40 to-ink/10"></div>
+            <div class="relative h-full flex flex-col justify-center px-6 sm:px-12 lg:px-20 max-w-content mx-auto pt-28">
+              <p class="font-en text-cream/80 text-sm uppercase tracking-widest mb-4">Small Space, Big Warmth</p>
+              <h1 class="font-serif text-4xl sm:text-6xl font-black text-cream leading-tight">一居一世界<br/>温馨不打挤</h1>
+              <p class="mt-5 text-lg sm:text-xl text-cream/90 max-w-xl leading-relaxed">30–70㎡ 也能住出通透与松弛，让小空间变成刚刚好的家。</p>
+              <div class="mt-8 flex flex-wrap gap-3">
+                <button data-nav="cases:small" class="btn-yolk px-7 py-3 cursor-pointer">看小户型案例</button>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-slide relative h-full w-full">
+            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=80" alt="栖屿设计客餐厅实景" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-r from-ink/75 via-ink/40 to-ink/10"></div>
+            <div class="relative h-full flex flex-col justify-center px-6 sm:px-12 lg:px-20 max-w-content mx-auto pt-28">
+              <p class="font-en text-cream/80 text-sm uppercase tracking-widest mb-4">Clear Pricing, Easy Mind</p>
+              <h1 class="font-serif text-4xl sm:text-6xl font-black text-cream leading-tight">透明套餐价<br/>安心每一步</h1>
+              <p class="mt-5 text-lg sm:text-xl text-cream/90 max-w-xl leading-relaxed">按房间 / 户型 / 风格打包，预算一眼看清，决策不再焦虑。</p>
+              <div class="mt-8 flex flex-wrap gap-3">
+                <button data-nav="about:contact" class="btn-yolk px-7 py-3 cursor-pointer">预约咨询</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button id="heroPrev" aria-label="上一张" class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-cream/85 border border-line flex items-center justify-center hover:bg-sand cursor-pointer z-10">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button id="heroNext" aria-label="下一张" class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-cream/85 border border-line flex items-center justify-center hover:bg-sand cursor-pointer z-10">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="heroDots" class="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2 z-10"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-cream/90 backdrop-blur border-t border-line/60 z-10">
+          <div class="max-w-content mx-auto px-6 py-4 flex justify-between items-center text-sm">
+            <span class="font-serif font-medium">栖屿设计 © 2026</span>
+            <span class="text-muted">个人独居温馨小宅定制</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 核心优势卡（4 张） -->
+      <div class="mx-auto max-w-content px-5 sm:px-7 pb-12">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="bg-sand/60 border border-line rounded-2xl p-6 hover:shadow-soft transition-shadow duration-200">
+            <span class="icon-yolk rounded-xl w-11 h-11">
+              <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11" stroke-linejoin="round"/><path d="M9 20v-6h6v6" stroke-linejoin="round"/></svg>
+            </span>
+            <h3 class="font-serif text-lg font-bold mt-4">独居专属方案</h3>
+            <p class="font-en text-[11px] text-muted uppercase mt-1">Tailored for Solo</p>
+            <p class="text-muted text-sm mt-2 leading-relaxed">聚焦一人居的空间与情感需求。</p>
+          </div>
+          <div class="bg-sand/60 border border-line rounded-2xl p-6 hover:shadow-soft transition-shadow duration-200">
+            <span class="icon-yolk rounded-xl w-11 h-11">
+              <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v18M7 7h10M7 12h10M7 17h6" stroke-linecap="round"/></svg>
+            </span>
+            <h3 class="font-serif text-lg font-bold mt-4">透明套餐价</h3>
+            <p class="font-en text-[11px] text-muted uppercase mt-1">Transparent Pricing</p>
+            <p class="text-muted text-sm mt-2 leading-relaxed">按房间/户型/风格打包，预算清晰。</p>
+          </div>
+          <div class="bg-sand/60 border border-line rounded-2xl p-6 hover:shadow-soft transition-shadow duration-200">
+            <span class="icon-yolk rounded-xl w-11 h-11">
+              <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round"/><circle cx="19" cy="18" r="2.5"/></svg>
+            </span>
+            <h3 class="font-serif text-lg font-bold mt-4">标准四阶段流程</h3>
+            <p class="font-en text-[11px] text-muted uppercase mt-1">4-Stage Process</p>
+            <p class="text-muted text-sm mt-2 leading-relaxed">需求→设计→落地→软装，确定感满满。</p>
+          </div>
+          <div class="bg-sand/60 border border-line rounded-2xl p-6 hover:shadow-soft transition-shadow duration-200">
+            <span class="icon-yolk rounded-xl w-11 h-11">
+              <svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 11c0 5.5-7 10-7 10Z" stroke-linejoin="round"/></svg>
+            </span>
+            <h3 class="font-serif text-lg font-bold mt-4">全程陪跑落地</h3>
+            <p class="font-en text-[11px] text-muted uppercase mt-1">End-to-End Support</p>
+            <p class="text-muted text-sm mt-2 leading-relaxed">量房到摆场，主材陪购一路跟进。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 精选案例 -->
+      <div class="mx-auto max-w-content px-5 sm:px-7 pb-12">
+        <div class="flex items-end justify-between mb-8">
+          <div>
+            <p class="font-en text-yolk-d text-sm uppercase">Featured</p>
+            <h2 class="font-serif text-3xl font-bold mt-1">精选案例</h2>
+          </div>
+          <button data-nav="cases" class="text-sm font-medium text-yolk-d hover:underline cursor-pointer">查看全部 →</button>
+        </div>
+        <div id="homeCases" class="featured-cases"></div>
+      </div>
+
+      <!-- 最新资讯 -->
+      <div class="mx-auto max-w-content px-5 sm:px-7 pb-12">
+        <div class="flex items-end justify-between mb-8">
+          <div>
+            <p class="font-en text-yolk-d text-sm uppercase">News</p>
+            <h2 class="font-serif text-3xl font-bold mt-1">最新资讯</h2>
+          </div>
+          <button data-nav="news" class="text-sm font-medium text-yolk-d hover:underline cursor-pointer">查看全部 →</button>
+        </div>
+        <div id="homeNews" class="grid sm:grid-cols-2 gap-6"></div>
+      </div>
+
+      <!-- CTA -->
+      <div class="mx-auto max-w-content px-5 sm:px-7 pb-16">
+        <div class="rounded-3xl bg-yolk/15 border border-yolk-d/30 p-10 text-center">
+          <h2 class="font-serif text-3xl font-bold text-ink">准备好把小家，变成刚刚好的样子了吗？</h2>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <button data-nav="packages" class="btn-yolk px-6 py-3 cursor-pointer">查看套餐</button>
+            <button data-nav="about:contact" class="inline-flex items-center justify-center px-6 py-3 rounded-full border border-line bg-cream hover:bg-sand transition-colors duration-200 cursor-pointer">预约咨询</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= 案例展示（独立页面 + 多维筛选 + 图片展示） ======================= -->
+    <section class="page hidden" data-page="cases">
+      <div class="page-hero reveal">
+        <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1920&q=80" alt="案例展示" />
+        <div class="overlay"></div>
+        <div class="content px-6">
+          <p class="eyebrow">Portfolio</p>
+          <h1>案例展示</h1>
+          <p class="sub">为独居青年打造的一居、开间、小两居。按分类、面积、风格多维筛选，找到和你同频的那个家。</p>
+        </div>
+      </div>
+      <div class="mx-auto max-w-content px-5 sm:px-7 py-16">
+        <div class="bg-cream border border-line rounded-2xl p-6 shadow-soft reveal">
+          <div class="space-y-4">
+            <div class="filter-group flex items-center flex-wrap gap-2" data-dim="category">
+              <span class="filter-label text-sm font-medium text-muted">分类</span>
+              <button class="fchip active px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="all">全部</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="private">私宅</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="small">小户型</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="apartment">公寓改造</button>
+            </div>
+            <div class="filter-group flex items-center flex-wrap gap-2" data-dim="area">
+              <span class="filter-label text-sm font-medium text-muted">面积</span>
+              <button class="fchip active px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="all">不限</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="a1">&lt;60㎡</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="a2">60–90㎡</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="a3">90–120㎡</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="a4">&gt;120㎡</button>
+            </div>
+            <div class="filter-group flex items-center flex-wrap gap-2" data-dim="style">
+              <span class="filter-label text-sm font-medium text-muted">风格</span>
+              <button class="fchip active px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="all">不限</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="奶油风">奶油风</button>
+              <button class="fchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-val="原木风">原木风</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-end justify-between mt-10 mb-6 reveal">
+          <p id="caseCount" class="text-sm text-muted"></p>
+        </div>
+        <div id="caseGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="casePagination" class="flex flex-wrap justify-center items-center gap-2 mt-12"></div>
+      </div>
+    </section>
+
+    <!-- ======================= 服务套餐（独立页面） ======================= -->
+    <section class="page hidden" data-page="packages">
+      <div class="page-hero reveal">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80" alt="服务套餐" />
+        <div class="overlay"></div>
+        <div class="content px-6">
+          <p class="eyebrow">Service Packages</p>
+          <h1>服务套餐</h1>
+          <p class="sub">弱化平方米计价，按房间 / 户型 / 风格打包，降低决策门槛，预算一眼看清。</p>
+        </div>
+      </div>
+      <div class="mx-auto max-w-content px-5 sm:px-7 py-16">
+        <div id="packageGrid" class="grid md:grid-cols-3 gap-6 mt-10">
+          <!-- 套餐卡片由 JS 从后台渲染 -->
+        </div>
+
+        <div class="mt-10 rounded-3xl bg-sand/50 border border-line p-8">
+          <h3 class="font-serif text-xl font-bold">套餐怎么选？</h3>
+          <ul class="mt-4 space-y-2 text-ink/75 text-sm leading-relaxed list-disc pl-5">
+            <li><b>只动一个房间</b> → 单空间改造包，性价比最高。</li>
+            <li><b>整屋重装 / 新家落地</b> → 整屋套餐包，全程托管更省心。</li>
+            <li><b>风格拿不准</b> → 风格定义包，先看效果再决定。</li>
+          </ul>
+          <button data-nav="about:contact" class="btn-yolk mt-6 px-6 py-3 cursor-pointer">预约咨询，为你推荐</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= 新闻资讯（独立页面 + 左图右文卡片） ======================= -->
+    <section class="page hidden" data-page="news">
+      <div class="page-hero reveal">
+        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80" alt="新闻资讯" />
+        <div class="overlay"></div>
+        <div class="content px-6">
+          <p class="eyebrow">News</p>
+          <h1>新闻资讯</h1>
+          <p class="sub">栖屿动态与行业观察，陪你一起把小家越住越好。</p>
+        </div>
+      </div>
+      <div class="mx-auto max-w-content px-5 sm:px-7 py-16">
+        <div class="flex flex-wrap gap-2 reveal" role="group" aria-label="资讯分类">
+          <button class="nchip active px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-news-filter="all">全部</button>
+          <button class="nchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-news-filter="company">企业新闻</button>
+          <button class="nchip px-4 py-2 rounded-full bg-cream border border-line text-sm cursor-pointer" data-news-filter="industry">行业资讯</button>
+        </div>
+
+        <div id="newsGrid" class="flex flex-col gap-5 mt-8"></div>
+      </div>
+    </section>
+
+    <!-- ======================= 招聘入口（独立页面 + 左图右文卡片） ======================= -->
+    <section class="page hidden" data-page="careers">
+      <div class="page-hero reveal">
+        <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1920&q=80" alt="招聘入口" />
+        <div class="overlay"></div>
+        <div class="content px-6">
+          <p class="eyebrow">Careers</p>
+          <h1>招聘入口</h1>
+          <p class="sub">和一群相信「独居也可以很温暖」的人，一起把好设计带给更多人。</p>
+        </div>
+      </div>
+      <div class="mx-auto max-w-content px-5 sm:px-7 py-16">
+        <div class="flex gap-3 reveal" role="tablist" aria-label="招聘类型">
+          <button class="tab-btn active px-5 py-2.5 rounded-full border border-line bg-cream text-sm font-medium cursor-pointer transition-colors" data-career-tab="social">社会招聘</button>
+          <button class="tab-btn px-5 py-2.5 rounded-full border border-line bg-cream text-sm font-medium cursor-pointer transition-colors" data-career-tab="campus">校园招聘</button>
+        </div>
+
+        <div data-career-panel="social" class="career-panel grid gap-5 mt-8" id="socialJobs"></div>
+        <div data-career-panel="campus" class="career-panel hidden grid gap-5 mt-8" id="campusJobs"></div>
+      </div>
+    </section>
+
+    <!-- ======================= 关于我们（独立页面，单页完整展示 + 高德地图） ======================= -->
+    <section class="page hidden" data-page="about">
+      <div class="page-hero reveal">
+        <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=80" alt="关于我们" />
+        <div class="overlay"></div>
+        <div class="content px-6">
+          <p class="eyebrow">About Us</p>
+          <h1>关于我们</h1>
+          <p class="sub">认识栖屿，认识一群把小家当作作品的人。</p>
+        </div>
+      </div>
+
+      <!-- 品牌介绍 -->
+      <div class="about-section" id="aboutBrand">
+        <div class="mx-auto max-w-content px-5 sm:px-7">
+          <div class="grid lg:grid-cols-2 gap-10 items-center">
+            <div class="reveal">
+              <p class="font-en text-yolk-d text-sm uppercase tracking-widest">Brand</p>
+              <h2 class="font-serif text-3xl font-bold mt-2">品牌介绍</h2>
+              <p class="lead mt-4">栖屿设计专注「个人独居温馨小家定制」，为 22–35 岁的独居青年，把一居、开间、小两居改造成温馨、好住、有风格的家。</p>
+              <p class="lead mt-4">我们相信，独居不是将就，而是另一种值得认真对待的生活方式。每一次设计，都是从「你一个人怎么住」开始。</p>
+              <div class="mt-8 grid grid-cols-3 gap-4 text-center">
+                <div class="bg-cream border border-line rounded-2xl p-4"><p class="font-en text-2xl font-bold text-yolk-d">500+</p><p class="text-xs text-muted mt-1">服务方案</p></div>
+                <div class="bg-cream border border-line rounded-2xl p-4"><p class="font-en text-2xl font-bold text-yolk-d">100%</p><p class="text-xs text-muted mt-1">专属定制</p></div>
+                <div class="bg-cream border border-line rounded-2xl p-4"><p class="font-en text-2xl font-bold text-yolk-d">4步</p><p class="text-xs text-muted mt-1">标准流程</p></div>
+              </div>
+            </div>
+            <div class="reveal">
+              <div class="rounded-3xl overflow-hidden border border-line shadow-soft">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80" alt="栖屿设计工作室" class="w-full h-80 lg:h-[420px] object-cover" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设计流程 -->
+      <div class="about-section alt" id="aboutProcess">
+        <div class="mx-auto max-w-content px-5 sm:px-7">
+          <div class="text-center mb-10 reveal">
+            <p class="font-en text-yolk-d text-sm uppercase tracking-widest">Process</p>
+            <h2 class="font-serif text-3xl font-bold mt-2">设计流程</h2>
+            <p class="lead mt-3 mx-auto">从需求到入住，四阶段标准化服务，让你安心做「甩手掌柜」。</p>
+          </div>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 reveal">
+            <div class="process-card">
+              <p class="num">01</p>
+              <h4>需求阶段</h4>
+              <p class="text-sm text-muted mt-2">问卷 → 沟通 → 上门量房 → 签合同</p>
+            </div>
+            <div class="process-card">
+              <p class="num">02</p>
+              <h4>设计阶段</h4>
+              <p class="text-sm text-muted mt-2">平面 → 效果图 → 软装 → 深化 → 预算</p>
+            </div>
+            <div class="process-card">
+              <p class="num">03</p>
+              <h4>落地阶段</h4>
+              <p class="text-sm text-muted mt-2">交底 → 主材陪购 → 施工验收</p>
+            </div>
+            <div class="process-card">
+              <p class="num">04</p>
+              <h4>软装阶段</h4>
+              <p class="text-sm text-muted mt-2">清单 → 摆场 → 新家实拍</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 设计团队 -->
+      <div class="about-section" id="aboutTeam">
+        <div class="mx-auto max-w-content px-5 sm:px-7">
+          <div class="text-center mb-10 reveal">
+            <p class="font-en text-yolk-d text-sm uppercase tracking-widest">Team</p>
+            <h2 class="font-serif text-3xl font-bold mt-2">设计团队</h2>
+            <p class="lead mt-3 mx-auto">每个案子背后，都有一位懂你生活方式的设计师。</p>
+          </div>
+          <div class="grid sm:grid-cols-3 gap-6 reveal">
+            <div class="team-card">
+              <div class="avatar">林</div>
+              <h4 class="font-serif text-lg font-bold mt-4">林小满</h4>
+              <p class="text-sm text-muted mt-1">主案设计师 · 原木日式</p>
+              <p class="text-sm text-muted mt-3">8 年住宅设计经验，擅长用自然材质营造温暖氛围。</p>
+            </div>
+            <div class="team-card">
+              <div class="avatar">周</div>
+              <h4 class="font-serif text-lg font-bold mt-4">周野</h4>
+              <p class="text-sm text-muted mt-1">主案设计师 · 极简北欧</p>
+              <p class="text-sm text-muted mt-3">关注小户型动线与收纳，让空间「看起来大、住起来顺」。</p>
+            </div>
+            <div class="team-card">
+              <div class="avatar">苏</div>
+              <h4 class="font-serif text-lg font-bold mt-4">苏棠</h4>
+              <p class="text-sm text-muted mt-1">软装搭配师 · 奶油风</p>
+              <p class="text-sm text-muted mt-3">用窗帘、灯具、织物为小家注入情绪与温度。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 发展历程 -->
+      <div class="about-section alt" id="aboutHistory">
+        <div class="mx-auto max-w-content px-5 sm:px-7">
+          <div class="grid lg:grid-cols-3 gap-10">
+            <div class="lg:sticky lg:top-28 self-start reveal">
+              <p class="font-en text-yolk-d text-sm uppercase tracking-widest">History</p>
+              <h2 class="font-serif text-3xl font-bold mt-2">发展历程</h2>
+              <p class="lead mt-3">从一个人到一支团队，从一间工作室到一百个温暖小家。</p>
+            </div>
+            <div class="lg:col-span-2 reveal">
+              <ol class="history-line">
+                <li><p class="font-en text-yolk-d text-sm font-medium">2021</p><h4 class="font-serif text-lg font-bold mt-1">品牌创立</h4><p class="text-muted text-sm mt-1">专注独居小宅定制方向，提出「一人居也要有温度」。</p></li>
+                <li><p class="font-en text-yolk-d text-sm font-medium">2023</p><h4 class="font-serif text-lg font-bold mt-1">百例交付</h4><p class="text-muted text-sm mt-1">累计服务独居用户超 100 户，沉淀标准化设计流程。</p></li>
+                <li><p class="font-en text-yolk-d text-sm font-medium">2024</p><h4 class="font-serif text-lg font-bold mt-1">套餐体系上线</h4><p class="text-muted text-sm mt-1">推出按房间 / 户型 / 风格打包的轻量套餐。</p></li>
+                <li><p class="font-en text-yolk-d text-sm font-medium">2026</p><h4 class="font-serif text-lg font-bold mt-1">官网升级</h4><p class="text-muted text-sm mt-1">全新品牌官网上线，案例、套餐、预约一站式触达。</p></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 联系我们 -->
+      <div class="about-section" id="aboutContact">
+        <div class="mx-auto max-w-content px-5 sm:px-7">
+          <div class="text-center mb-10 reveal">
+            <p class="font-en text-yolk-d text-sm uppercase tracking-widest">Contact Us</p>
+            <h2 class="font-serif text-3xl font-bold mt-2">联系我们</h2>
+            <p class="lead mt-3 mx-auto">填写下方表单，顾问会尽快与您联系（预约量房 / 在线咨询）。</p>
+          </div>
+
+          <div class="contact-info-grid reveal">
+            <div class="contact-info-card">
+              <div class="icon"><svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z" stroke-linecap="round"/></svg></div>
+              <h4>联系电话</h4>
+              <p id="contactPhone">400-XXX-XXXX</p>
+            </div>
+            <div class="contact-info-card">
+              <div class="icon"><svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 5l10 7 10-7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <h4>电子邮箱</h4>
+              <p id="contactEmail">hello@qiyu.design</p>
+            </div>
+            <div class="contact-info-card">
+              <div class="icon"><svg viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="10" r="4"/><path d="M2 10c0 4 4 9 10 12 6-3 10-8 10-12a10 10 0 1 0-20 0Z" stroke-linejoin="round"/></svg></div>
+              <h4>公司地址</h4>
+              <p id="contactAddress">上海市黄浦区南京东路 100 号</p>
+            </div>
+          </div>
+
+          <div class="mt-10 grid lg:grid-cols-2 gap-8 items-stretch reveal">
+            <div class="map-wrap">
+              <iframe title="栖屿设计门店位置地图" loading="lazy"
+                src="https://uri.amap.com/marker?position=121.4737%2C31.2304&name=%E6%A0%96%E5%B1%BF%E8%AE%BE%E8%AE%A1%E5%B7%A5%E4%BD%9C%E5%AE%A4&src=qiyu&coordinate=gaode&callnative=0"
+                class="w-full" style="height:360px;border:0;"
+                allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <form id="contactForm" class="bg-cream border border-line rounded-3xl p-6 sm:p-8">
+              <h3 class="font-serif text-xl font-bold mb-4">在线预约</h3>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <input id="cfName" required class="px-4 py-3 rounded-xl border border-line bg-sand/40" placeholder="姓名" aria-label="姓名" />
+                <input id="cfPhone" required pattern="1[0-9]{10}" class="px-4 py-3 rounded-xl border border-line bg-sand/40" placeholder="手机号" aria-label="手机号" />
+              </div>
+              <input id="cfBudget" class="px-4 py-3 rounded-xl border border-line bg-sand/40 w-full mt-4" placeholder="预算范围（选填）" aria-label="预算范围" />
+              <textarea id="cfContent" class="px-4 py-3 rounded-xl border border-line bg-sand/40 w-full mt-4" rows="3" placeholder="需求描述（如：38㎡ 开间想做原木风）" aria-label="需求描述"></textarea>
+              <button type="submit" class="btn-yolk mt-4 w-full px-6 py-3 cursor-pointer">提交预约</button>
+              <p id="formMsg" class="mt-3 text-yolk-d font-medium hidden text-center">✓ 提交成功，顾问会尽快联系您！</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================= 页脚（社媒矩阵） ======================= -->
+  <footer class="border-t border-line mt-10 bg-cream">
+    <div class="mx-auto max-w-content px-5 sm:px-7 py-12">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="icon-yolk rounded-lg w-9 h-9">
+              <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5M5.5 10.5V19h13v-8.5" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="font-serif font-bold text-lg">栖屿设计</span>
+          </div>
+          <p class="text-sm text-muted leading-relaxed">个人独居温馨小家定制 · 让独居生活有温度。</p>
+        </div>
+        <div>
+          <p class="font-en text-xs text-muted uppercase mb-3">Quick Links</p>
+          <ul class="space-y-2 text-sm">
+            <li><a data-nav="cases" class="hover:text-yolk-d cursor-pointer">案例展示</a></li>
+            <li><a data-nav="packages" class="hover:text-yolk-d cursor-pointer">服务套餐</a></li>
+            <li><a data-nav="about:team" class="hover:text-yolk-d cursor-pointer">设计团队</a></li>
+            <li><a data-nav="about:contact" class="hover:text-yolk-d cursor-pointer">联系我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-en text-xs text-muted uppercase mb-3">Contact</p>
+          <ul class="space-y-2 text-sm text-muted">
+            <li>电话：400-XXX-XXXX</li>
+            <li>邮箱：hello@qiyu.design</li>
+            <li>地址：城市 · 区 · 街道</li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-en text-xs text-muted uppercase mb-3">Social</p>
+          <div class="flex gap-3">
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full border border-line text-muted cursor-pointer hover:bg-sand" aria-label="微信"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="10" r="6"/><circle cx="16" cy="15" r="5"/></svg></span>
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full border border-line text-muted cursor-pointer hover:bg-sand" aria-label="抖音"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 4v9a3 3 0 1 1-3-3M14 4c0 3 2 4 5 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full border border-line text-muted cursor-pointer hover:bg-sand" aria-label="小红书"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9v6M15 9v6M9 12h6" stroke-linecap="round"/></svg></span>
+            <span class="inline-flex items-center justify-center w-10 h-10 rounded-full border border-line text-muted cursor-pointer hover:bg-sand" aria-label="视频号"><svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M10 9.5l5 2.5-5 2.5z" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-10 pt-6 border-t border-line text-xs text-muted flex flex-col sm:flex-row justify-between gap-2">
+        <span>© 2026 栖屿设计 QIYU STUDIO · 个人独居温馨小宅定制</span>
+        <span>京ICP备XXXXXXXX号 · 隐私政策</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================= 案例 / 资讯 详情弹窗 + 分享 ======================= -->
+  <div id="detailModal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-ink/40 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+    <div class="bg-cream rounded-3xl border border-line shadow-soft max-w-2xl w-full max-h-[88vh] overflow-y-auto">
+      <div class="flex items-start justify-between p-6 sm:p-8 border-b border-line">
+        <div>
+          <p id="detailTag" class="text-xs text-yolk-d font-medium"></p>
+          <h3 id="detailTitle" class="font-serif text-2xl font-bold mt-1"></h3>
+        </div>
+        <button id="detailClose" type="button" aria-label="关闭" class="w-9 h-9 rounded-full border border-line flex items-center justify-center hover:bg-sand cursor-pointer">
+          <svg viewBox="0 0 24 24" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="p-6 sm:p-8">
+        <div id="detailBody" class="text-ink/80 leading-relaxed"></div>
+        <div class="mt-7 flex flex-wrap items-center gap-3">
+          <button id="shareBtn" type="button" class="btn-yolk gap-2 px-5 py-2.5 cursor-pointer">
+            <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 3v13M8 7l4-4 4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            复制链接分享给朋友
+          </button>
+          <span id="shareHint" class="text-sm text-yolk-d font-medium"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 轻提示 -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] hidden px-5 py-3 rounded-full bg-ink text-cream text-sm shadow-soft"></div>
+
+  <script>
+    /* ======================= 后台 API 配置 ======================= */
+    // 同源访问（http://localhost:3001/site/...）用相对路径；file:// 直开时回退到后台绝对地址
+    var API_BASE = (location.protocol === 'file:') ? 'http://localhost:3001' : '';
+    function api(method, path, body){
+      var opt = { method: method, headers: { 'Content-Type': 'application/json' } };
+      if (body !== undefined) opt.body = JSON.stringify(body);
+      return fetch(API_BASE + path, opt).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); });
+    }
+    // HTML 转义（防 XSS，后台数据注入前台渲染时必用）
+    function esc(s){
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; });
+    }
+    function showFormMsg(el, msg, isErr){
+      el.textContent = msg;
+      el.classList.remove('hidden', 'text-yolk-d', 'text-red-500');
+      el.classList.add(isErr ? 'text-red-500' : 'text-yolk-d');
+    }
+
+    /* ======================= 数据（本地兜底，加载后会被远程覆盖） ======================= */
+    var CASES = [
+      { id:0, category:'private',   area:75,  style:'原木风', title:'暖白一居 · 木语时光', img:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80', desc:'以暖白与原木为主调，为独居女生打造的一方治愈小天地。客厅与卧室用半透纱帘软隔断，白天引入自然光，夜晚暖灯点亮仪式感。' },
+      { id:1, category:'small',     area:38,  style:'原木风', title:'38㎡ 折叠之家',       img:'https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=800&q=80', desc:'38㎡ 开间通过折叠家具与通顶收纳，把睡眠、工作、待客三种模式压缩进同一空间。白天是通透工作室，夜晚一键展开成卧室。' },
+      { id:2, category:'apartment', area:88,  style:'奶油风', title:'loft 光影重构',       img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80', desc:'挑高 loft 重新梳理上下动线，二层睡眠区退后、一层公共区留白。天窗与镜面把光影折叠进每个角落。' },
+      { id:3, category:'private',   area:105, style:'奶油风', title:'奶油原木两居',        img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80', desc:'奶油色墙面搭配原木地板，两居改一居+书房。去电视墙、做整面书墙，让阅读成为生活中心。' },
+      { id:4, category:'small',     area:45,  style:'奶油风', title:'开间魔术改造',        img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80', desc:'单开间用色彩分区：暖黄睡眠角、雾蓝工作角、米白待客角。墙体不动，靠家具与灯光完成功能切换。' },
+      { id:5, category:'private',   area:132, style:'原木风', title:'大平层木格栅之家',    img:'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=80', desc:'132㎡ 大平层以木格栅划分节奏，开放厨房连接餐厅与客厅，独居也能从容待客。' },
+      { id:6, category:'apartment', area:62,  style:'奶油风', title:'老破小奶油重生',      img:'https://images.unsplash.com/photo-1600121848594-d8644e57c6c1?auto=format&fit=crop&w=800&q=80', desc:'62㎡ 旧公寓整体翻新，奶油色统一调性，收纳隐形化，小空间也有大从容。' },
+      { id:7, category:'small',     area:55,  style:'原木风', title:'胶囊原木工作室',      img:'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=800&q=80', desc:'55㎡ 开间把工作区嵌入飘窗与通顶柜，原木温润质感中和都市的冷。' },
+      { id:8, category:'apartment', area:96,  style:'原木风', title:'复式挑高木语',        img:'https://images.unsplash.com/photo-1600573472550-8090b5e0436c?auto=format&fit=crop&w=800&q=80', desc:'96㎡ 复式以原木踏步连接上下，挑空处留作阅读角，动静分明。' }
+    ];
+    var NEWS_DATA = [
+      { id:0, tag:'企业新闻', title:'栖屿设计获年度温馨人居奖', date:'2026-05-18', summary:'在 2026 年度人居设计评选中，栖屿设计凭借「独居小宅」系列作品荣获温馨人居奖。', body:'在 2026 年度人居设计评选中，栖屿设计凭借「独居小宅」系列作品荣获温馨人居奖，评审肯定了我们对一人居情感需求的细腻回应。', img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80' },
+      { id:1, tag:'行业资讯', title:'2026 独居经济下的小宅设计趋势', date:'2026-04-22', summary:'随着独居人口持续增长，小宅设计从「够住」走向「好住」。', body:'随着独居人口持续增长，小宅设计从「够住」走向「好住」。本报告梳理了收纳隐形化、风格个性化、智能轻量化三大趋势。', img:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80' },
+      { id:2, tag:'企业新闻', title:'新工作室落址城市副中心', date:'2026-03-08', summary:'为更好服务周边独居青年，新工作室正式落址城市副中心。', body:'为更好服务周边独居青年，栖屿设计新工作室正式落址城市副中心，提供到店咨询与样板间实景体验。', img:'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80' },
+      { id:3, tag:'行业资讯', title:'小户型收纳的 5 个心理学原则', date:'2026-02-14', summary:'收纳不只是空间问题，更是心理秩序。', body:'收纳不只是空间问题，更是心理秩序。我们总结了对抗焦虑、降低决策、视觉留白等 5 个心理学原则，帮你把小家收拾得更安心。', img:'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80' }
+    ];
+    var CAREERS_DATA = {
+      social: [
+        { title:'主案设计师', type:'全职', location:'上海 · 徐汇', summary:'负责独居小宅方案设计，3 年以上住宅设计经验，能手绘表达、懂施工图。', desc:'负责独居小宅方案设计，3 年以上住宅设计经验。熟悉小户型改造、收纳规划与效果图呈现。', icon:'design' },
+        { title:'软装搭配师', type:'全职', location:'上海 · 徐汇', summary:'负责软装清单与摆场，审美在线、细节控优先，熟悉家具供应链。', desc:'负责软装清单与摆场，审美在线、细节控优先。', icon:'soft' }
+      ],
+      campus: [
+        { title:'设计实习生', type:'实习', location:'上海 · 徐汇', summary:'设计/环艺相关专业，热爱小空间与生活美学，每周到岗 4 天以上。', desc:'设计/环艺相关专业，热爱小空间与生活美学。', icon:'intern' },
+        { title:'新媒体运营（校招）', type:'应届', location:'上海 · 徐汇', summary:'负责小红书/抖音内容，懂独居青年的语言，会拍摄与基础剪辑。', desc:'负责小红书/抖音内容，懂独居青年的语言。', icon:'media' }
+      ]
+    };
+    var PACKAGES_DATA = [];
+    var SITE_DATA = {};
+
+    function catLabel(c){ return c==='private'?'私宅':c==='small'?'小户型':'公寓改造'; }
+    function areaBucket(a){ return a<60?'a1':a<90?'a2':a<120?'a3':'a4'; }
+
+    /* ======================= 页面路由 ======================= */
+    var pages = Array.prototype.slice.call(document.querySelectorAll('.page'));
+    function showPage(page){
+      pages.forEach(function(p){
+        var on = p.getAttribute('data-page') === page;
+        p.classList.toggle('hidden', !on);
+        p.classList.toggle('is-active', on);
+      });
+      window.scrollTo(0, 0);
+      updateNavActive(page);
+    }
+    function updateNavActive(page){
+      document.querySelectorAll('[data-nav]').forEach(function(l){ l.removeAttribute('aria-current'); });
+      document.querySelectorAll('[data-nav="' + page + '"]').forEach(function(l){ l.setAttribute('aria-current', 'true'); });
+    }
+    function navigate(spec){
+      var parts = (spec || '').split(':');
+      var page = parts[0], sub = parts[1];
+      var changed = !document.querySelector('.page[data-page="' + page + '"].is-active');
+      showPage(page);
+      if (page === 'cases' && sub) { caseFilters.category = new Set([sub]); syncCaseChips('category'); currentCasePage = 1; renderCases(); }
+      else if (page === 'news' && sub) setNewsFilter(sub);
+      else if (page === 'careers' && sub) setCareerTab(sub);
+      else if (page === 'about' && sub) {
+        var targetId = 'about' + (sub.charAt(0).toUpperCase() + sub.slice(1));
+        setTimeout(function(){
+          var el = document.getElementById(targetId);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, changed ? 350 : 50);
+      }
+    }
+
+    document.querySelectorAll('[data-nav]').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        if (el.classList.contains('case-image-card') || el.classList.contains('case-card') || el.classList.contains('news-card') || el.classList.contains('career-row')) return;
+        var inside = el.closest('.case-image-card, .news-card, .career-row');
+        if (inside) return;
+        e.preventDefault();
+        navigate(el.getAttribute('data-nav'));
+        var drawer = document.getElementById('mobileMenu');
+        if (drawer && !drawer.classList.contains('hidden')) {
+          drawer.classList.add('hidden');
+          document.getElementById('menuToggle').setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    /* 移动端抽屉 + 二级手风琴 */
+    var menuToggle = document.getElementById('menuToggle');
+    var mobileMenu = document.getElementById('mobileMenu');
+    menuToggle.addEventListener('click', function () {
+      var hidden = mobileMenu.classList.toggle('hidden');
+      menuToggle.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+    });
+    document.querySelectorAll('[data-mobile-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var panel = btn.nextElementSibling;
+        var icon = btn.querySelector('svg');
+        var open = panel.classList.toggle('hidden') === false;
+        if (icon) icon.style.transform = open ? 'rotate(180deg)' : '';
+      });
+    });
+
+    /* ======================= 案例：多维筛选 + 分页 ======================= */
+    var caseFilters = { category: new Set(['all']), area: new Set(['all']), style: new Set(['all']) };
+    var CASE_PAGE_SIZE = 6;
+    var currentCasePage = 1;
+    function inDim(set, key){ return set.has('all') || set.has(key); }
+    function caseMatches(c){
+      return inDim(caseFilters.category, c.category) && inDim(caseFilters.area, areaBucket(c.area)) && inDim(caseFilters.style, c.style);
+    }
+    function renderCases(){
+      var grid = document.getElementById('caseGrid'); if (!grid) return;
+      grid.innerHTML = '';
+      var list = CASES.filter(caseMatches);
+      var total = list.length;
+      var totalPages = Math.max(1, Math.ceil(total / CASE_PAGE_SIZE));
+      if (currentCasePage > totalPages) currentCasePage = totalPages;
+      if (currentCasePage < 1) currentCasePage = 1;
+      var start = (currentCasePage - 1) * CASE_PAGE_SIZE;
+      var pageList = list.slice(start, start + CASE_PAGE_SIZE);
+      pageList.forEach(function(c){
+        var d = document.createElement('div');
+        d.className = 'case-image-card card';
+        d.innerHTML =
+          '<div class="thumb"><img src="' + c.img + '" alt="' + c.title + '" loading="lazy" /></div>' +
+          '<div class="meta">' +
+            '<span class="tag">' + catLabel(c.category) + '</span>' +
+            '<h3>' + c.title + '</h3>' +
+            '<div class="facts"><span>' + c.area + '㎡</span><span class="mx-1">·</span><span>' + c.style + '</span>' + (c.price_per_sqm ? '<span class="mx-1">·</span><span>¥' + c.price_per_sqm + '/㎡</span>' : '') + '</div>' +
+          '</div>';
+        d.addEventListener('click', function(){ openCaseById('case-' + c.id); });
+        grid.appendChild(d);
+      });
+      if (!total) grid.innerHTML = '<p class="text-muted col-span-full">没有符合条件的案例，换个筛选组合试试～</p>';
+      var cnt = document.getElementById('caseCount'); if (cnt) cnt.textContent = '共 ' + total + ' 个案例 · 第 ' + currentCasePage + ' / ' + totalPages + ' 页';
+      renderCasePagination(totalPages);
+    }
+    function renderCasePagination(totalPages){
+      var box = document.getElementById('casePagination'); if (!box) return;
+      box.innerHTML = '';
+      if (totalPages <= 1) return;
+      var prev = document.createElement('button');
+      prev.className = 'px-3 py-2 rounded-lg border border-line bg-cream text-sm hover:bg-sand disabled:opacity-40 cursor-pointer';
+      prev.textContent = '上一页';
+      prev.disabled = currentCasePage === 1;
+      prev.addEventListener('click', function(){ currentCasePage--; renderCases(); });
+      box.appendChild(prev);
+      for (var i = 1; i <= totalPages; i++) {
+        var b = document.createElement('button');
+        b.className = 'w-9 h-9 rounded-lg border text-sm font-medium transition-colors cursor-pointer ' + (i === currentCasePage ? 'page-active' : 'border-line bg-cream hover:bg-sand');
+        b.textContent = i;
+        b.addEventListener('click', (function(n){ return function(){ currentCasePage = n; renderCases(); }; })(i));
+        box.appendChild(b);
+      }
+      var next = document.createElement('button');
+      next.className = 'px-3 py-2 rounded-lg border border-line bg-cream text-sm hover:bg-sand disabled:opacity-40 cursor-pointer';
+      next.textContent = '下一页';
+      next.disabled = currentCasePage === totalPages;
+      next.addEventListener('click', function(){ currentCasePage++; renderCases(); });
+      box.appendChild(next);
+    }
+    function toggleCaseFilter(dim, val){
+      var set = caseFilters[dim];
+      if (val === 'all') { caseFilters[dim] = new Set(['all']); return; }
+      set.delete('all');
+      if (set.has(val)) set.delete(val); else set.add(val);
+      if (set.size === 0) set.add('all');
+    }
+    function syncCaseChips(dim){
+      document.querySelectorAll('.filter-group[data-dim="' + dim + '"] .fchip').forEach(function(b){
+        b.classList.toggle('active', caseFilters[dim].has(b.getAttribute('data-val')));
+      });
+    }
+    document.querySelectorAll('.filter-group .fchip').forEach(function(b){
+      b.addEventListener('click', function(){
+        var dim = b.closest('.filter-group').getAttribute('data-dim');
+        toggleCaseFilter(dim, b.getAttribute('data-val'));
+        syncCaseChips(dim);
+        currentCasePage = 1;
+        renderCases();
+      });
+    });
+
+    /* ======================= 套餐：从后台渲染 ======================= */
+    function renderPackages(){
+      var grid = document.getElementById('packageGrid'); if (!grid) return;
+      var list = PACKAGES_DATA.length ? PACKAGES_DATA : [
+        { id:1, name:'单空间改造包', type:'单空间', cover:'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=800&q=80', summary:'客厅 / 卧室 / 厨房 / 卫生间 单项设计，局部焕新。', price_from:3800, price_per_sqm:180, price_note:'单空间改造 ¥180/㎡ 起，最低 3,800 元/项', process_steps:[] },
+        { id:2, name:'整屋套餐包', type:'整屋', cover:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80', summary:'一居室 / 小两居 全屋一体化设计，全流程托管。', price_from:12800, price_per_sqm:260, price_note:'整屋全案托管 ¥260/㎡ 起，最低 12,800 元/套', process_steps:[] },
+        { id:3, name:'风格定义包', type:'风格', cover:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80', summary:'奶油风 / 原木日式 / 极简北欧 等风格方案。', price_from:2800, price_per_sqm:150, price_note:'风格定义与效果图 ¥150/㎡ 起，最低 2,800 元/套', process_steps:[] }
+      ];
+      grid.innerHTML = '';
+      list.forEach(function(p, idx){
+        var d = document.createElement('article');
+        d.className = 'card group flex flex-col relative';
+        d.innerHTML =
+          '<div class="h-48 overflow-hidden">' +
+            '<img src="' + (p.cover || 'https://placehold.co/800x480') + '" alt="' + esc(p.name) + '" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />' +
+          '</div>' +
+          (idx === 1 ? '<span class="absolute top-4 right-4 badge-yolk text-[11px] px-2.5 py-1 rounded-full font-medium">最受欢迎</span>' : '') +
+          '<div class="p-6 flex flex-col flex-1">' +
+            '<span class="badge-yolk text-xs px-2.5 py-1 rounded-full mb-3 self-start">' + esc(p.type) + '</span>' +
+            '<h3 class="font-serif text-xl font-bold">' + esc(p.name) + '</h3>' +
+            '<p class="text-muted mt-2 text-sm leading-relaxed flex-1">' + esc(p.summary) + '</p>' +
+            '<p class="mt-5 font-en text-sm text-muted uppercase">Price · ' + (p.price_per_sqm ? '¥' + p.price_per_sqm + '/㎡ 起' : (p.price_from ? '¥' + p.price_from + ' 起' : '后台配置')) + '</p>' +
+          '</div>';
+        d.addEventListener('click', function(){ openPackageDetail(p); });
+        grid.appendChild(d);
+      });
+    }
+    function openPackageDetail(p){
+      var steps = (p.process_steps || []).length ? '<ul class="mt-3 space-y-1 text-sm text-ink/70 list-disc pl-5">' + p.process_steps.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>' : '';
+      var priceTag = '<p class="mt-3 text-sm font-medium text-ink/80">' + (p.price_note || (p.price_per_sqm ? '约 ¥' + p.price_per_sqm + '/㎡ 起' : (p.price_from ? '¥' + p.price_from + ' 起' : '价格详情请咨询顾问'))) + '</p>';
+      openDetail('package', 'pkg-' + p.id, { tag: p.type, title: p.name, body: priceTag + (p.description || p.summary) + steps });
+    }
+
+    /* ======================= 新闻：筛选 + 渲染 ======================= */
+    var newsFilter = 'all';
+    function renderNews(){
+      var grid = document.getElementById('newsGrid'); if (!grid) return;
+      grid.innerHTML = '';
+      NEWS_DATA.filter(function(n){
+        return newsFilter === 'all' ||
+          (newsFilter === 'company' && n.tag === '企业新闻') ||
+          (newsFilter === 'industry' && n.tag === '行业资讯');
+      }).forEach(function(n){
+        var a = document.createElement('a');
+        a.className = 'info-row card news-card cursor-pointer';
+        a.innerHTML =
+          '<div class="cover"><img src="' + n.img + '" alt="' + n.title + '" loading="lazy" /></div>' +
+          '<div class="body">' +
+            '<div class="flex items-start justify-between gap-4">' +
+              '<div>' +
+                '<p class="label">' + n.tag + '</p>' +
+                '<h3>' + n.title + '</h3>' +
+              '</div>' +
+              '<span class="aside">' + n.date + '</span>' +
+            '</div>' +
+            '<p>' + n.summary + '</p>' +
+          '</div>';
+        a.addEventListener('click', function(e){ e.preventDefault(); openDetail('news', 'news-' + n.id, n); });
+        grid.appendChild(a);
+      });
+    }
+    function setNewsFilter(cat){
+      newsFilter = cat;
+      document.querySelectorAll('[data-news-filter]').forEach(function(b){
+        b.classList.toggle('active', b.getAttribute('data-news-filter') === cat);
+      });
+      renderNews();
+    }
+    document.querySelectorAll('[data-news-filter]').forEach(function(b){
+      b.addEventListener('click', function(){ setNewsFilter(b.getAttribute('data-news-filter')); });
+    });
+
+    /* ======================= 招聘 Tab + 渲染 ======================= */
+    function careerIcon(name){
+      var icons = {
+        design: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18M5 21V7l8-4 8 4v14M9 21v-6h6v6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        soft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        intern: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        media: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M17 8l-5 3-5-3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      };
+      return icons[name] || icons.design;
+    }
+    function renderCareers(list, containerId){
+      var box = document.getElementById(containerId); if (!box) return;
+      box.innerHTML = '';
+      list.forEach(function(j){
+        var d = document.createElement('div');
+        d.className = 'career-row card';
+        d.innerHTML =
+          '<div class="icon-box">' + careerIcon(j.icon) + '</div>' +
+          '<div class="body p-6">' +
+            '<div class="flex items-start justify-between gap-4 flex-wrap">' +
+              '<h3 class="font-serif text-lg font-bold">' + j.title + '</h3>' +
+              '<span class="aside">' + j.location + ' · ' + j.type + '</span>' +
+            '</div>' +
+            '<p class="text-sm text-muted mt-2">' + j.summary + '</p>' +
+          '</div>';
+        box.appendChild(d);
+      });
+    }
+    function setCareerTab(tab){
+      document.querySelectorAll('[data-career-tab]').forEach(function(b){
+        b.classList.toggle('active', b.getAttribute('data-career-tab') === tab);
+      });
+      document.querySelectorAll('.career-panel').forEach(function(p){
+        var on = p.getAttribute('data-career-panel') === tab;
+        p.classList.toggle('hidden', !on);
+        if (on) p.classList.add('reveal', 'visible');
+      });
+    }
+    document.querySelectorAll('[data-career-tab]').forEach(function(b){
+      b.addEventListener('click', function(){ setCareerTab(b.getAttribute('data-career-tab')); });
+    });
+
+    /* ======================= 联系表单（提交到后台） ======================= */
+    function bindContactForm(){
+      var form = document.getElementById('contactForm'); if (!form) return;
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var btn = form.querySelector('button[type="submit"]');
+        var original = btn.textContent; btn.textContent = '提交中…'; btn.disabled = true;
+        var payload = {
+          name: document.getElementById('cfName').value.trim(),
+          phone: document.getElementById('cfPhone').value.trim(),
+          budget: document.getElementById('cfBudget').value.trim(),
+          content: document.getElementById('cfContent').value.trim(),
+          source_page: '/about/contact'
+        };
+        // file:// 模式下浏览器会拦截 fetch 跨域请求（ERR_FAILED），改用 JSONP（动态 <script>）提交
+        if (location.protocol === 'file:') { submitViaJsonp(payload, btn, original); return; }
+        var r;
+        try { r = await api('POST', '/api/v1/messages', payload); }
+        catch (err) {
+          btn.textContent = original; btn.disabled = false;
+          showFormMsg(document.getElementById('formMsg'), '提交失败：后台服务未启动，请确认 3001 端口已运行，或改用 http://localhost:3001/site/index-v7.html 打开前台', true);
+          return;
+        }
+        btn.textContent = original; btn.disabled = false;
+        if (r.ok && r.d.code === 0) {
+          showFormMsg(document.getElementById('formMsg'), '✓ 提交成功，顾问会尽快联系您！', false);
+          form.reset();
+        } else {
+          showFormMsg(document.getElementById('formMsg'), '提交失败：' + (r.d && r.d.message || '网络错误'), true);
+        }
+      });
+    }
+    // file:// 直开时的 JSONP 提交回退（绕过 fetch 跨域限制）
+    function submitViaJsonp(payload, btn, original){
+      var cbName = 'qiyuCb_' + Date.now();
+      var params = new URLSearchParams({
+        callback: cbName, name: payload.name, phone: payload.phone,
+        budget: payload.budget, content: payload.content, source_page: payload.source_page
+      });
+      window[cbName] = function (resp) {
+        delete window[cbName];
+        btn.textContent = original; btn.disabled = false;
+        if (resp && resp.code === 0) {
+          showFormMsg(document.getElementById('formMsg'), '✓ 提交成功，顾问会尽快联系您！', false);
+          document.getElementById('contactForm').reset();
+        } else {
+          showFormMsg(document.getElementById('formMsg'), '提交失败：' + (resp && resp.message || '未知错误'), true);
+        }
+      };
+      var s = document.createElement('script');
+      s.src = API_BASE + '/api/v1/messages?' + params.toString();
+      s.onerror = function () {
+        delete window[cbName];
+        btn.textContent = original; btn.disabled = false;
+        showFormMsg(document.getElementById('formMsg'), '提交失败：后台服务未启动，请确认 3001 端口已运行，或改用 http://localhost:3001/site/index-v7.html 打开前台', true);
+      };
+      document.body.appendChild(s);
+    }
+    // file:// 直开时显示顶部提示横幅
+    if (location.protocol === 'file:') {
+      var fb = document.getElementById('fileModeBanner');
+      if (fb) fb.classList.remove('hidden');
+    }
+
+    /* ======================= 首页 Hero 轮播 ======================= */
+    var track = document.getElementById('heroTrack');
+    var slides = track.children.length;
+    var idx = 0, timer = null;
+    var dotsWrap = document.getElementById('heroDots');
+    for (var i = 0; i < slides; i++) {
+      var d = document.createElement('button');
+      d.className = 'dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('aria-label', '第' + (i + 1) + '张');
+      d.addEventListener('click', (function (n) { return function () { go(n); }; })(i));
+      dotsWrap.appendChild(d);
+    }
+    function go(n) {
+      idx = (n + slides) % slides;
+      track.style.transform = 'translateX(' + (-idx * 100) + '%)';
+      dotsWrap.querySelectorAll('.dot').forEach(function (dot, i) { dot.classList.toggle('active', i === idx); });
+      restart();
+    }
+    function next() { go(idx + 1); }
+    function restart() { clearInterval(timer); timer = setInterval(next, 5000); }
+    document.getElementById('heroPrev').addEventListener('click', function () { go(idx - 1); });
+    document.getElementById('heroNext').addEventListener('click', function () { go(idx + 1); });
+    var heroBox = track.parentElement;
+    heroBox.addEventListener('mouseenter', function () { clearInterval(timer); });
+    heroBox.addEventListener('mouseleave', restart);
+    restart();
+
+    /* ======================= 详情弹窗 + 一键复制链接分享 ======================= */
+    var detailModal = document.getElementById('detailModal');
+    var detailTag = document.getElementById('detailTag');
+    var detailTitle = document.getElementById('detailTitle');
+    var detailBody = document.getElementById('detailBody');
+    var detailClose = document.getElementById('detailClose');
+    var shareBtn = document.getElementById('shareBtn');
+    var toastEl = document.getElementById('toast');
+    var toastTimer = null;
+
+    function showToast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function(){ toastEl.classList.add('hidden'); }, 2200);
+    }
+    function openDetail(type, id, data){
+      detailTag.textContent = data.tag;
+      detailTitle.textContent = data.title;
+      detailBody.textContent = data.body;
+      detailModal.dataset.type = type;
+      detailModal.dataset.id = id;
+      detailModal.classList.remove('hidden');
+      detailModal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDetail(){
+      detailModal.classList.add('hidden');
+      detailModal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+    detailClose.addEventListener('click', closeDetail);
+    detailModal.addEventListener('click', function(e){ if(e.target === detailModal) closeDetail(); });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeDetail(); });
+
+    function fallbackCopy(text){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); showToast('链接已复制，去分享给朋友吧～'); }
+      catch(err){ showToast('复制失败，请手动复制链接'); }
+      document.body.removeChild(ta);
+    }
+    function shareCurrent(){
+      var type = detailModal.dataset.type;
+      var id = detailModal.dataset.id;
+      var key = (type === 'case') ? 'c' : (type === 'package') ? 'p' : 'n';
+      var url = location.origin + location.pathname + '?' + key + '=' + encodeURIComponent(id);
+      if(navigator.share){
+        navigator.share({ title: detailTitle.textContent, url: url }).catch(function(){});
+        return;
+      }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url).then(function(){ showToast('链接已复制，去分享给朋友吧～'); })
+          .catch(function(){ fallbackCopy(url); });
+      } else { fallbackCopy(url); }
+    }
+    shareBtn.addEventListener('click', shareCurrent);
+
+    function openCaseById(idStr){
+      var id = parseInt(String(idStr).replace('case-', ''), 10);
+      var c = CASES.find(function(x){ return x.id === id; });
+      if (!c) return;
+      var body = c.body || c.desc;
+      if (c.price_per_sqm) body += '\n\n参考价格：约 ¥' + c.price_per_sqm + '/㎡ 起' + (c.price_note ? ' · ' + c.price_note : '');
+      if (c.designer) body += '\n\n主创设计师：' + c.designer;
+      if (c.location) body += ' · ' + c.location;
+      if (c.material) body += '\n\n材料说明：' + c.material;
+      openDetail('case', 'case-' + c.id, { tag: catLabel(c.category), title: c.title, body: body });
+    }
+
+    /* 首页精选案例 / 最新资讯 */
+    function buildFeaturedDesc(c){
+      var summary = (c.desc || c.summary || '').trim();
+      var body = (c.body || c.content || '').trim();
+      if (summary && body) {
+        var firstBody = body.split(/\n+/)[0] || '';
+        return [summary, firstBody].filter(function(s){ return s.trim(); });
+      }
+      if (summary) return [summary];
+      if (body) {
+        var paras = body.split(/\n+/).map(function(s){ return s.trim(); }).filter(Boolean);
+        return paras.length ? paras.slice(0, 2) : [body];
+      }
+      return ['小户型 × 奶油色的温柔日常，量房到摆场全程托管。'];
+    }
+    function renderHomeFeatured(){
+      var box = document.getElementById('homeCases');
+      if (box) {
+        box.innerHTML = '';
+        CASES.slice(0, 3).forEach(function(c, idx){
+          var descParas = buildFeaturedDesc(c);
+          var reverseClass = idx % 2 === 1 ? ' reverse' : '';
+          var d = document.createElement('div');
+          d.className = 'featured-case' + reverseClass;
+          var priceBit = c.price_per_sqm ? '<span class="dot">·</span><span>¥' + c.price_per_sqm + '/㎡ 起</span>' : '';
+          var locBit = c.location ? '<span class="dot">·</span><span>' + esc(c.location) + '</span>' : '';
+          d.innerHTML =
+            '<div class="featured-img">' +
+              '<img src="' + c.img + '" alt="' + esc(c.title) + '" loading="lazy" />' +
+              '<span class="cat-tag">' + catLabel(c.category) + '</span>' +
+            '</div>' +
+            '<div class="info">' +
+              '<p class="brand-label">QIYU · 栖屿精选</p>' +
+              '<h3 class="case-title">' + esc(c.title) + '</h3>' +
+              '<div class="desc-box">' + descParas.slice(0, 2).map(function(p){ return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' +
+              '<div class="meta-line">' +
+                '<span>' + c.area + '㎡</span>' +
+                '<span class="dot">·</span><span>' + c.style + '</span>' +
+                priceBit + locBit +
+              '</div>' +
+              '<span class="more-link">查看详情</span>' +
+            '</div>';
+          d.addEventListener('click', function(){ openCaseById('case-' + c.id); });
+          box.appendChild(d);
+        });
+      }
+      var nbox = document.getElementById('homeNews');
+      if (nbox) {
+        NEWS_DATA.slice(0, 2).forEach(function(n){
+          var a = document.createElement('a');
+          a.className = 'info-row card news-card cursor-pointer';
+          a.innerHTML =
+            '<div class="cover"><img src="' + n.img + '" alt="' + n.title + '" loading="lazy" /></div>' +
+            '<div class="body">' +
+              '<div class="flex items-start justify-between gap-4">' +
+                '<div><p class="label">' + n.tag + '</p><h3>' + n.title + '</h3></div>' +
+                '<span class="aside">' + n.date + '</span>' +
+              '</div>' +
+              '<p>' + n.summary + '</p>' +
+            '</div>';
+          a.addEventListener('click', function(e){ e.preventDefault(); openDetail('news', 'news-' + n.id, n); });
+          nbox.appendChild(a);
+        });
+      }
+    }
+
+    /* ======================= 远程数据加载（前后台交互） ======================= */
+    function normalizeCase(c){
+      return {
+        id: c.id, category: c.category, area: c.area || 0,
+        style: (c.style_tags && c.style_tags[0]) || '原木风',
+        title: c.title, img: c.cover || (c.gallery && c.gallery[0]),
+        desc: c.summary || c.content || '',
+        body: c.content || c.summary || '',
+        gallery: c.gallery || [], material: c.material_notes || '', designer: c.designer || '', location: c.location || '',
+        price_per_sqm: c.price_per_sqm || 0, price_note: c.price_note || ''
+      };
+    }
+    function normalizePackage(p){
+      return {
+        id: p.id, name: p.name, type: p.type, cover: p.cover,
+        summary: p.summary, description: p.description,
+        applicable_house_type: p.applicable_house_type,
+        price_from: p.price_from, price_per_sqm: p.price_per_sqm || 0,
+        price_note: p.price_note || '', process_steps: p.process_steps || []
+      };
+    }
+    async function loadRemoteData(){
+      try {
+        var [casesR, pkgsR, siteR, newsR, careersR] = await Promise.all([
+          api('GET','/api/v1/cases?pageSize=100'),
+          api('GET','/api/v1/packages'),
+          api('GET','/api/v1/site'),
+          api('GET','/api/v1/news'),
+          api('GET','/api/v1/careers')
+        ]);
+        if (casesR.ok && casesR.d.code === 0 && casesR.d.data.items && casesR.d.data.items.length) {
+          CASES = casesR.d.data.items.filter(function(c){ return c.status === 'published'; }).map(normalizeCase);
+        }
+        if (pkgsR.ok && pkgsR.d.code === 0 && pkgsR.d.data && pkgsR.d.data.length) {
+          PACKAGES_DATA = pkgsR.d.data.filter(function(p){ return p.status === 'published'; }).map(normalizePackage);
+        }
+        if (siteR.ok && siteR.d.code === 0 && siteR.d.data) {
+          SITE_DATA = siteR.d.data;
+          if (SITE_DATA.contact_info) {
+            document.querySelectorAll('#contactPhone').forEach(function(el){ if(el) el.textContent = SITE_DATA.contact_info.phone || el.textContent; });
+            document.querySelectorAll('#contactEmail').forEach(function(el){ if(el) el.textContent = SITE_DATA.contact_info.email || el.textContent; });
+            document.querySelectorAll('#contactAddress').forEach(function(el){ if(el) el.textContent = SITE_DATA.contact_info.address || el.textContent; });
+          }
+        }
+        // 新闻 / 招聘：后台有数据则覆盖本地兜底数据
+        if (newsR.ok && newsR.d.code === 0 && newsR.d.data && newsR.d.data.length) {
+          NEWS_DATA = newsR.d.data.map(function(n){
+            return {
+              id: n.id, tag: n.tag || '企业新闻', title: n.title, date: (n.date || '').slice(0, 10),
+              summary: n.summary || '', body: n.body || n.summary || '',
+              img: n.cover || n.img || ''
+            };
+          });
+        }
+        if (careersR.ok && careersR.d.code === 0 && careersR.d.data && careersR.d.data.length) {
+          var careers = { social: [], campus: [] };
+          careersR.d.data.forEach(function(j){
+            var item = { title: j.title, type: j.type, location: j.location, summary: j.summary || '', desc: j.desc || j.summary || '', icon: j.icon || 'design' };
+            if (j.category === 'campus') careers.campus.push(item); else careers.social.push(item);
+          });
+          if (careers.social.length || careers.campus.length) CAREERS_DATA = careers;
+        }
+      } catch(e){ console.log('远程数据加载失败，使用本地兜底数据', e); }
+      renderHomeFeatured();
+      renderCases();
+      renderPackages();
+      renderNews();
+      renderCareers(CAREERS_DATA.social, 'socialJobs');
+      renderCareers(CAREERS_DATA.campus, 'campusJobs');
+      initRouting();
+    }
+
+    /* ======================= 初始化 ======================= */
+    try { loadRemoteData(); } catch (e) { console.error('远程数据加载异常:', e); }
+    // 联系表单监听器独立绑定，不依赖 loadRemoteData 内部是否抛错（避免提交未被拦截→表单默认跳转首页）
+    bindContactForm();
+
+    /* 滚动渐入 */
+    var io2 = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: .12, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(function(el){ io2.observe(el); });
+
+    function initRouting(){
+      var p = new URLSearchParams(location.search);
+      if (p.has('c')) { var id = p.get('c'); showPage('cases'); openCaseById(id); }
+      else if (p.has('p')) {
+        var pid = parseInt(String(p.get('p')).replace('pkg-', ''), 10);
+        var pkg = PACKAGES_DATA.find(function(x){ return x.id === pid; });
+        if (pkg) { showPage('packages'); openPackageDetail(pkg); }
+        else showPage('home');
+      }
+      else if (p.has('n')) {
+        var j = parseInt(String(p.get('n')).replace('news-', ''), 10);
+        var n = NEWS_DATA.find(function(x){ return x.id === j; });
+        if (n) { showPage('news'); openDetail('news', 'news-' + n.id, n); }
+        else showPage('home');
+      }
+      else { showPage('home'); }
+    }
+  </script>
+</body>
+</html>

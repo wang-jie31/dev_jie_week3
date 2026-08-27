@@ -1,0 +1,25 @@
+# 栖屿设计 · 后端依赖（FastAPI 模块化单体）
+# 安装：pip install -r requirements.txt
+
+# --- Web 框架 ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# --- ORM / 数据库 ---
+SQLAlchemy==2.0.36
+alembic==1.14.0
+psycopg[binary]==3.2.3          # PostgreSQL 异步驱动（asyncpg 亦可，这里用 psycopg3）
+
+# --- 安全 ---
+argon2-cffi==23.1.0             # 密码哈希 argon2id
+cryptography==43.0.3            # AES-256-GCM 身份证加密
+PyJWT==2.10.1                   # JWT access/refresh
+pydantic-settings==2.7.0        # 配置管理（.env）
+
+# --- 文件上传 ---
+python-multipart==0.0.20
+
+# --- 测试 ---
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1                   # FastAPI TestClient / 异步测试

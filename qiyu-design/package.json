@@ -1,0 +1,26 @@
+{
+  "name": "qiyu-design",
+  "version": "0.1.0",
+  "private": true,
+  "description": "栖屿设计 · 室内设计企业官网（前台 Next.js + 后台 Vite React + 后端 FastAPI + PostgreSQL 16）",
+  "packageManager": "npm@10.9.0",
+  "workspaces": [
+    "apps/web",
+    "apps/admin",
+    "packages/ui",
+    "packages/api-types"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:web": "npm run dev -w apps/web",
+    "dev:admin": "npm run dev -w apps/admin",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "generate:types": "node scripts/generate-api-types.mjs",
+    "db:migrate": "cd api && .venv/Scripts/alembic upgrade head",
+    "db:seed": "cd api && .venv/Scripts/python scripts/migrate_prototype.py"
+  }
+}

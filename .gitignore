@@ -1,0 +1,53 @@
+# ===== 环境与密钥（绝不提交） =====
+# 数据库连接字符串 / 密钥 / 密码等本地敏感配置
+.env
+.env.*
+!.env.example
+
+# ===== 安装包与临时文件（第 1 步使用） =====
+# PostgreSQL 安装包存放目录（D 盘本地，不纳入版本库）
+*.exe
+
+# ===== Node / pnpm =====
+node_modules/
+node_modules.*/
+.pnpm-store/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ===== Next.js / Vite 构建产物 =====
+.next/
+# 变体目录（.next_dev_s8/.next_bak_*/.next_old_* 等）
+.next*/
+dist/
+build/
+out/
+coverage/
+
+# ===== 备份/临时目录（手工 mv 产生的 node_modules.bak / .next_bak 等） =====
+*_bak*/
+*_bak_*/
+*_old*/
+*old_del*/
+npm_bak/
+.pnpm-store/
+
+# ===== 数据库本地数据与迁移临时 =====
+# （PG 数据目录在 D:\PostgreSQL\16\data，不入库）
+
+# ===== IDE / 系统 =====
+.idea/
+.vscode/
+*.swp
+Thumbs.db
+.DS_Store
+
+# ===== 上传文件（本地卷，运行时生成） =====
+uploads/

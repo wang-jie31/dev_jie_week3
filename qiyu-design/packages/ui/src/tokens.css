@@ -1,0 +1,130 @@
+/* ============================================================
+ * 栖屿设计 · UIUX Design Tokens（对应《UIUX设计文档.md》§2）
+ * 嫩黄系 · 奶油底 · 墨色文字 —— 温馨克制
+ * 前后台共享：apps/web、apps/admin 均从此包引入
+ * ============================================================ */
+
+:root {
+  /* --- 色板（§2.1） --- */
+  --yolk: #f7d06a;        /* 主黄：实心标签/当前态/主按钮底 */
+  --yolk-d: #edb93f;      /* 深黄：下划线、轮播圆点 active、边框、焦点环 */
+  --ink: #4a3f30;         /* 墨色：标题/正文主色 */
+  --ink-2: #3a3226;       /* 深墨：hover 加深 */
+  --muted: #9a8c75;       /* 次级文字/元信息 */
+  --muted-bg: #efeae0;    /* 中性底色：草稿/只读 */
+  --cream: #fffdf6;       /* 柔奶油：页面/卡片底色 */
+  --sand: #f9f3e6;        /* hover 底色 */
+  --gold: #c8951f;        /* 强调文字：导航当前态/标签/联系图标 */
+  --brand-red: #c73e3a;   /* 精选红：仅首页精选区品牌标签/描边 */
+
+  /* --- 功能色（§2.3 状态色） --- */
+  --orange: #c0732b;      /* 施工中 constructing */
+  --purple: #7e57c2;      /* 方案设计 designing */
+
+  /* --- 字体（§2.4） --- */
+  --font-serif: "Noto Serif SC", "Source Han Serif SC", serif;
+  --font-sans: "Noto Sans SC", Inter, system-ui, -apple-system, sans-serif;
+  --font-en: Inter, "Noto Sans SC", system-ui, sans-serif;
+
+  /* --- 字号（§2.4） --- */
+  --text-h1: 2.5rem;      /* Hero 标题 */
+  --text-h2: 1.75rem;     /* 板块标题 */
+  --text-h3: 1.15rem;     /* 卡片标题（精选案例 1.9rem） */
+  --text-body: 14px;      /* 正文 */
+  --text-eyebrow: 12px;   /* 英文 eyebrow，字距 0.14-0.22em */
+  --text-num-lg: 2.25rem; /* 大号装饰数字（流程/编号） */
+
+  /* --- 圆角/阴影/间距 --- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --shadow-card: 0 2px 12px rgba(74, 63, 48, 0.08);
+  --shadow-pop: 0 8px 24px rgba(74, 63, 48, 0.12);
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+}
+
+/* --- 基础重置与全局样式（前后台共用） --- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.75;
+  color: var(--ink);
+  background-color: var(--cream);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  color: var(--ink);
+  margin: 0;
+}
+
+.eyebrow {
+  font-family: var(--font-en);
+  text-transform: uppercase;
+  font-size: var(--text-eyebrow);
+  letter-spacing: 0.18em;
+  color: var(--gold);
+}
+
+/* 焦点可见环（无障碍 §11） */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--yolk-d);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* 深色按钮（后台新增） */
+.btn-ink {
+  background-color: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-ink:hover {
+  background-color: var(--ink-2);
+}
+
+/* 主黄按钮 */
+.btn-yolk {
+  background-color: var(--yolk);
+  color: var(--ink);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-yolk:hover {
+  background-color: var(--yolk-d);
+}
+
+/* 滚动渐入动画（§10） */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
